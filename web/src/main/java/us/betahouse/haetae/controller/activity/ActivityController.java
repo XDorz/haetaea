@@ -601,8 +601,8 @@ public class ActivityController {
                 if(StringUtils.isBlank(request.getOrderRule())){
                     builder.withOrderRule(request.getOrderRule());
                 }
-                if (StringUtils.isNotBlank(request.getUserId())) {//获取到的是StuId。通过StuId找UserId
-                    builder.withUserId(request.getUserId());
+                if (StringUtils.isNotBlank(request.getSearchCreatorStuId())) {//获取到的是StuId。通过StuId找UserId
+                    builder.withUserId(request.getSearchCreatorStuId());
                 }
                 if (StringUtils.isNotBlank(request.getActivityName())) {
                     builder.withActivityName(request.getActivityName());
@@ -652,8 +652,8 @@ public class ActivityController {
                 if(StringUtils.isBlank(request.getOrderRule())){
                     builder.withOrderRule(request.getOrderRule());
                 }
-                if (StringUtils.isNotBlank(request.getUserId())) {//获取到的是StuId。通过StuId找UserId
-                    builder.withUserId(request.getUserId());
+                if (StringUtils.isNotBlank(request.getSearchCreatorStuId())) {//获取到的是StuId。通过StuId找UserId
+                    builder.withUserId(request.getSearchCreatorStuId());
                 }
                 if (StringUtils.isNotBlank(request.getActivityName())) {
                     builder.withActivityName(request.getActivityName());
