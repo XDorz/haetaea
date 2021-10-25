@@ -309,37 +309,6 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         return recordStatistics;
     }
 
-//    @Override
-//    public List<String> exportExcel(ActivityStampRequest request, OperateContext context) throws IOException {
-//        ActivityDO activityDO = activityDORepo.findByActivityId(request.getActivityId());
-//        FileSystemView fsv = FileSystemView.getFileSystemView();
-//        File com=fsv.getHomeDirectory();
-//        //导到桌面上
-//        CsvWriter csvWriter = new CsvWriter(com.getPath()+"\\"+activityDO.getActivityName()+"导出名单.csv", ',', Charset.forName("GBK"));
-//        String[] headers ={"学号", "姓名","专业","年级","班级"};
-//        csvWriter.writeRecord(headers);
-//        List<ActivityRecordBO> activityRecordBOList = activityRecordManager.queryByActivityId(request.getActivityId());
-//        List<String> users = new LinkedList<>();
-//        for (ActivityRecordBO activityRecordBO : activityRecordBOList){
-//            users.add(activityRecordBO.getUserId());
-//        }
-//        List<UserInfoBO> userInfoBOList = userInfoRepoService.batchQueryByUserIds(users);
-//        int i=1;
-//        for (UserInfoBO userInfoBO : userInfoBOList) {
-//            i++;
-//            String[] content = new String[15];
-//            content[0] = userInfoBO.getStuId();
-//            content[1] = userInfoBO.getRealName();
-//            content[2] = userInfoBO.getMajor();
-//            content[3] = userInfoBO.getGrade();
-//            content[4] = userInfoBO.getClassId();
-//
-//            csvWriter.writeRecord(content);
-//        }
-//        csvWriter.close();
-//        return null;
-//    }
-
     @Override
     public List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) throws IOException {
         ActivityDO activityDO = activityDORepo.findByActivityId(request.getActivityId());

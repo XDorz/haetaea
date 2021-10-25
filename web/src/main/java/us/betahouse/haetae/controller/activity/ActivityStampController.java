@@ -350,7 +350,6 @@ public class ActivityStampController {
 
             @Override
             public Result<List<String>> execute() throws IOException {
-                //暂时还是用了导出csv
                 OperateContext context = new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityStampRequest activityStampRequest=new ActivityStampRequest();
