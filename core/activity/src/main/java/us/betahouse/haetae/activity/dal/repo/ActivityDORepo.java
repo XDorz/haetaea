@@ -157,7 +157,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             "and organization_message like concat('%',?,'%') " +
             "and user_id=(select user_id from common_user_info where stu_id=?) " +
             "and activity_stamped_start>=? and activity_stamped_end<=? " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           String stuId,Date start,Date end,int formIndex,int size);
@@ -172,7 +172,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
             "and activity_stamped_start>=? and activity_stamped_end<=? " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                                       Date start,Date end,int formIndex,int size);
@@ -186,7 +186,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
             "and user_id=(select user_id from common_user_info where stu_id=?) " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           String stuId,int formIndex,int size);
@@ -199,7 +199,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
 
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           int formIndex,int size);
