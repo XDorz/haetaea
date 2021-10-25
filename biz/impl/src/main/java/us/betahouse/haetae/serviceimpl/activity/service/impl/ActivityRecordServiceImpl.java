@@ -361,7 +361,8 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         return null;
     }
 
-    private List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList){
+    @Override
+    public List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList){
         List<Map<String, Object>> listmap = new ArrayList<Map<String, Object>>();
         try {
             Map<String, Object> map = new HashMap<String, Object>();

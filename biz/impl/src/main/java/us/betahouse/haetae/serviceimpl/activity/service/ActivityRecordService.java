@@ -11,10 +11,12 @@ import us.betahouse.haetae.serviceimpl.activity.model.ActivityRecordStatistics;
 import us.betahouse.haetae.serviceimpl.activity.model.StampRecord;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityStampRequest;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
+import us.betahouse.haetae.user.model.basic.UserInfoBO;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动记录服务
@@ -106,6 +108,7 @@ public interface ActivityRecordService {
      */
     List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) throws IOException;
 
+
     /**
      * （excel）批量导入活动章
      *
@@ -115,4 +118,12 @@ public interface ActivityRecordService {
      * @return
      */
     List<String> importExcel(MultipartFile file, ActivityStampRequest request, OperateContext context);
+
+    /**
+     * 填写excel数据
+     *
+     * @param userInfoBOList 用户信息
+     * @return
+     */
+    List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList);
 }
