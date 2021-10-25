@@ -12,6 +12,7 @@ import us.betahouse.haetae.serviceimpl.activity.model.StampRecord;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityStampRequest;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -103,7 +104,7 @@ public interface ActivityRecordService {
      * @param context
      * @return
      */
-    List<String> exportExcel(ActivityStampRequest request, OperateContext context) throws IOException;
+    List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) throws IOException;
 
     /**
      * （excel）批量导入活动章

@@ -38,6 +38,7 @@ import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -336,10 +337,10 @@ public class ActivityStampController {
      * @return
      */
     @CrossOrigin
-    @PostMapping(value = "exportExcel")
-        @CheckLogin
+    @GetMapping(value = "exportExcel")
+    @CheckLogin
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<List<String>> exportExcel(StamperRequest request,HttpServletRequest httpServletRequest) {
+    public Result<List<String>> exportExcel(StamperRequest request, HttpServletRequest httpServletRequest, HttpServletResponse response) {
         return RestOperateTemplate.operate(LOGGER, "（excel）批量导出活动章", request, new RestOperateCallBack<List<String>>() {
             @Override
             public void before() {
@@ -354,7 +355,7 @@ public class ActivityStampController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityStampRequest activityStampRequest=new ActivityStampRequest();
                 activityStampRequest.setActivityId(request.getActivityId());
-                List<String> unbathRows=activityRecordService.exportExcel(activityStampRequest,context);
+                List<String> unbathRows=activityRecordService.exportExcel(activityStampRequest,response,context);
                 return RestResultUtil.buildSuccessResult(unbathRows, "（excel）批量导出活动名单成功");
             }
         });
