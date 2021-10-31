@@ -779,7 +779,7 @@ public class ActivityServiceImpl implements ActivityService {
         re.setPage(page);
         re.setLimit(limit);
         re.setOrderRule(orderRule);
-        return activityManager.findCanceledByUserId(re);
+        return activityManager.findApprovedByUserId(re);
     }
 
     @Override

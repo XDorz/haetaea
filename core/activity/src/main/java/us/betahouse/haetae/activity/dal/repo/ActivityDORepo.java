@@ -249,7 +249,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @return
      */
     //
-    @Query(value = "select * from activity where gmt_create >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
 
@@ -267,7 +267,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param activityName
      * @return
      */
-    @Query(value = "select * from activity where gmt_create >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     Page<ActivityDO> findCreatedThisWeek(Pageable pageable,String activityName);
 
@@ -276,7 +276,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param pageable
      * @return
      */
-    @Query(value = "select * from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and approved_time >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and approved_time >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     Page<ActivityDO> findApprovedThisWeek(Pageable pageable,String activityName);
 
