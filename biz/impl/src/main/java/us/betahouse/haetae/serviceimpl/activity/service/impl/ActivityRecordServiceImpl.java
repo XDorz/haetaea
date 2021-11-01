@@ -51,6 +51,7 @@ import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.exceptions.BetahouseException;
 import us.betahouse.util.utils.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
@@ -309,34 +310,49 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     }
 
     @Override
-    public List<String> exportExcel(ActivityStampRequest request, OperateContext context) throws IOException {
+    public List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) {
         ActivityDO activityDO = activityDORepo.findByActivityId(request.getActivityId());
-        FileSystemView fsv = FileSystemView.getFileSystemView();
-        File com=fsv.getHomeDirectory();
-        //导到桌面上
-        CsvWriter csvWriter = new CsvWriter(com.getPath()+"\\"+activityDO.getActivityName()+"导出名单.csv", ',', Charset.forName("GBK"));
-        String[] headers ={"学号", "姓名","专业","年级","班级"};
-        csvWriter.writeRecord(headers);
+        String fileName = activityDO.getActivityName();
         List<ActivityRecordBO> activityRecordBOList = activityRecordManager.queryByActivityId(request.getActivityId());
         List<String> users = new LinkedList<>();
         for (ActivityRecordBO activityRecordBO : activityRecordBOList){
             users.add(activityRecordBO.getUserId());
         }
         List<UserInfoBO> userInfoBOList = userInfoRepoService.batchQueryByUserIds(users);
-        int i=1;
-        for (UserInfoBO userInfoBO : userInfoBOList) {
-            i++;
-            String[] content = new String[15];
-            content[0] = userInfoBO.getStuId();
-            content[1] = userInfoBO.getRealName();
-            content[2] = userInfoBO.getMajor();
-            content[3] = userInfoBO.getGrade();
-            content[4] = userInfoBO.getClassId();
-
-            csvWriter.writeRecord(content);
+        try {
+            List<Map<String,Object>> list=createExcelRecord(userInfoBOList);
+            String columnNames[] = {"学号","姓名","专业","年级","班级"};//列名
+            String keys[] = {"stuId","realName","majorId","grade","classId"};//map中的key
+            us.betahouse.util.utils.ExcelUtil.downloadWorkBook(list,keys,columnNames,fileName,response);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        csvWriter.close();
         return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList){
+        List<Map<String, Object>> listmap = new ArrayList<Map<String, Object>>();
+        try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("sheetName", "sheet1");
+            listmap.add(map);
+            int i=1;
+            for (UserInfoBO userInfoBO : userInfoBOList) {
+                i++;
+                Map<String, Object> mapValue = new HashMap<String, Object>();
+                mapValue.put("stuId",userInfoBO.getStuId());
+                mapValue.put("realName",userInfoBO.getRealName());
+                mapValue.put("majorId",userInfoBO.getMajor());
+                mapValue.put("grade",userInfoBO.getGrade());
+                mapValue.put("classId",userInfoBO.getClassId());
+
+                listmap.add(mapValue);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listmap;
     }
 
     @Override

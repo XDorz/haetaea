@@ -98,7 +98,7 @@ public class ActivityController {
      * @param httpServletRequest
      * @return
      */
-    //@CheckLogin
+    @CheckLogin
     @PostMapping
     //添加活动时设置modified默认为false
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -571,6 +571,7 @@ public class ActivityController {
             }
         });
     }
+
     /**
      * 获取已审批通过的活动列表 可以按负责人学号、活动名称、举办单位、扫章时间模糊查询
      *
