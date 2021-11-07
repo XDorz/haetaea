@@ -253,13 +253,6 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             ,nativeQuery = true)
     List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
 
-    /**
-     * 根据活动id列表查询活动
-     * @param pageable
-     * @param activityIdList
-     * @return
-     */
-    Page<ActivityDO> findByActivityIdIn(Pageable pageable,List<String> activityIdList);
 
     /**
      * 本周创建的活动分页查询

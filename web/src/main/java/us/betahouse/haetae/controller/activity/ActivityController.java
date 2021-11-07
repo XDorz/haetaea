@@ -762,36 +762,25 @@ public class ActivityController {
     @CheckLogin
     @GetMapping(value = "/week/unQualified")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<PageList<ActivityBO>> getUnQualifiedActivityListThisWeek(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
-        return RestOperateTemplate.operate(LOGGER, "获取本周不合格的活动列表", request, new RestOperateCallBack<PageList<ActivityBO>>() {
+    public Result<List<ActivityBO>> getUnQualifiedActivityListThisWeek(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "获取本周不合格的活动列表", request, new RestOperateCallBack<List<ActivityBO>>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
             }
             @Override
-            public Result<PageList<ActivityBO>> execute() {
+            public Result<List<ActivityBO>> execute() {
                 OperateContext context = new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
-                if(request.getPage()!=null&&request.getPage()!=0){
-                    builder.withPage(request.getPage());
-                }
-                if(request.getLimit()!=null&&request.getLimit()!=0){
-                    builder.withLimit(request.getLimit());
-                }
-                if(StringUtils.isBlank(request.getOrderRule())){
-                    builder.withOrderRule(request.getOrderRule());
-                }
                 //活动名称可选
                 if (StringUtils.isNotBlank(request.getActivityName())) {
                     builder.withActivityName(request.getActivityName());
                 }
-                //测试时将时间限制删除
                 return RestResultUtil.buildSuccessResult(activityService.findUnQualifiedThisWeek(builder.build(), context), "获取本周不合格的活动列表成功");
             }
         });
     }
-
 
     /**
      * 驳回审批

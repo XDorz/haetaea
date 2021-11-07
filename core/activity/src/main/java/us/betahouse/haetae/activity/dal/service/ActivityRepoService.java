@@ -231,10 +231,7 @@ public interface ActivityRepoService {
      * @param activityName
      * @return
      */
-    List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
-
-
-    PageList<ActivityBO> findByActivityList(Integer page, Integer limit,List<String> activityIdList);
+    List<ActivityBO> findCreatedThisWeekNotPage(String activityName);
 
     /**
      * 查找本周创建的活动

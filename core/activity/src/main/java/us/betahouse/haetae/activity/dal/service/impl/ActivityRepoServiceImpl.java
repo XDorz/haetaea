@@ -5,6 +5,7 @@
 package us.betahouse.haetae.activity.dal.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,7 @@ import us.betahouse.util.utils.LoggerUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -325,15 +323,14 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
 
 
     @Override
-    public List<ActivityDO> findCreatedThisWeekNotPage(String activityName) {
-        List<ActivityDO> createdThisWeekNotPage = activityDORepo.findCreatedThisWeekNotPage(activityName);
-        return createdThisWeekNotPage;
-    }
-
-    @Override
-    public PageList<ActivityBO> findByActivityList(Integer page, Integer limit, List<String> activityIdList) {
-        Pageable pageable = PageRequest.of(page, limit);
-        return new PageList<>(activityDORepo.findByActivityIdIn(pageable,activityIdList), this::convert);
+    public List<ActivityBO> findCreatedThisWeekNotPage(String activityName) {
+        List<ActivityBO> activityBOList = new ArrayList<>();
+        List<ActivityDO> createdThisWeekNotPage = (activityDORepo.findCreatedThisWeekNotPage(activityName));
+        for (ActivityDO activityDO : createdThisWeekNotPage) {
+            ActivityBO activityBO = convert(activityDO);
+            activityBOList.add(activityBO);
+        }
+        return activityBOList;
     }
 
 

@@ -673,62 +673,36 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public PageList<ActivityBO> findUnQualifiedThisWeek(ActivityManagerRequest request, OperateContext context) {
-        Integer page=0;
-        Integer limit=10;
+    public List<ActivityBO> findUnQualifiedThisWeek(ActivityManagerRequest request, OperateContext context) {
         String orderRule="DESC";
         String activityName = "%" + "" + "%";
-        if(NumberUtils.isNotBlank(request.getPage())){
-            page=request.getPage();
-        }
-        if(NumberUtils.isNotBlank(request.getLimit())){
-            limit=request.getLimit();
-        }
-        if(StringUtils.isNotBlank(request.getOrderRule())){
-            //顺序
-            String asc="ASC";
-            if(asc.equals(request.getOrderRule())){
-                orderRule=asc;
-            }
-        }
         if(StringUtils.isNotBlank(request.getActivityName())){
             activityName = "%" + request.getActivityName() + "%";
         }
-        PageList<ActivityBO> activityBOPageList = null;
         ActivityRequest re=new ActivityRequest();
-        re.setPage(page);
-        re.setLimit(limit);
         re.setOrderRule(orderRule);
         re.setActivityName(activityName);
-        //用于收集所有未达标的活动的id
-        List<String> activityIdList=new ArrayList<>();
-        //先不分页的查询所有本周不合格的活动的id
-        List<ActivityDO> createdThisWeekNotPage = activityManager.findCreatedThisWeekNotPage(re);
-        for (ActivityDO activityDO : createdThisWeekNotPage) {
-            String activityId = activityDO.getActivityId();
-            int actualStamperNumber = activityRecordRepoService.queryActualStamperNumByActivityId(activityId);
-            int applicationStamper = activityDO.getApplicationStamper();
-            Double stamperPercentageDeviation = (Double.valueOf(actualStamperNumber)-applicationStamper)/applicationStamper;
-            if(stamperPercentageDeviation>1|stamperPercentageDeviation<-1){
-                activityIdList.add(activityId);
-            }
-        }
-        //根据idList查询活动
-        activityBOPageList = activityManager.findByActivityList(re,activityIdList);
-        activityBOPageList.getContent().forEach(activityBO -> {
+        //用于存放未达标的活动
+        List<ActivityBO> unQualifiedActivityList=new ArrayList<>();
+        //本周创建的所有活动
+        List<ActivityBO> createdThisWeekNotPage = activityManager.findCreatedThisWeekNotPage(re);
+        for (ActivityBO activityBO : createdThisWeekNotPage) {
             String activityId = activityBO.getActivityId();
             int actualStamperNumber = activityRecordRepoService.queryActualStamperNumByActivityId(activityId);
-            activityBO.setActualStamper(actualStamperNumber);
             int applicationStamper = activityBO.getApplicationStamper();
             Double stamperPercentageDeviation = (Double.valueOf(actualStamperNumber)-applicationStamper)/applicationStamper;
-            activityBO.setStamperPercentageDeviation(stamperPercentageDeviation);
-        });
-        activityBOPageList.getContent().forEach(activityBO -> {
+            if(stamperPercentageDeviation>0.01|stamperPercentageDeviation<-0.01){
+                //添加未达标的活动
+                unQualifiedActivityList.add(activityBO);
+            }
+        }
+        //添加学号
+        unQualifiedActivityList.forEach(activityBO -> {
             String creatorId = activityBO.getCreatorId();
             String getstuId = userInfoRepoService.queryUserInfoByUserId(creatorId).getStuId();
             activityBO.setStuId(getstuId);
         });
-        return activityBOPageList;
+        return unQualifiedActivityList;
     }
 
     @Override

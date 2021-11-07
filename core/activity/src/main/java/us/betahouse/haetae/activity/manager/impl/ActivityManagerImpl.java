@@ -246,8 +246,8 @@ public class ActivityManagerImpl implements ActivityManager {
     }
 
     @Override
-    public List<ActivityDO> findCreatedThisWeekNotPage(ActivityRequest request) {
-        List<ActivityDO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
+    public List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request) {
+        List<ActivityBO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
         return  createdThisWeekNotPage;
     }
 
@@ -261,10 +261,6 @@ public class ActivityManagerImpl implements ActivityManager {
         return  activityRepoService.findApprovedThisWeek(request.getPage(), request.getLimit(),request.getActivityName());
     }
 
-    @Override
-    public PageList<ActivityBO> findByActivityList(ActivityRequest request, List<String> activityIdList) {
-        return activityRepoService.findByActivityList(request.getPage(), request.getLimit(),activityIdList);
-    }
 
     /**
      * 活动审批通过
