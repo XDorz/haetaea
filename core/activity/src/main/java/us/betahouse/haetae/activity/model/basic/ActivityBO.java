@@ -69,7 +69,7 @@ public class ActivityBO extends ToString {
     /**
      * 活动申请章数
      */
-    private int applicationStamper;
+    private Integer applicationStamper;
 
     /**
      * 活动描述
@@ -358,11 +358,11 @@ public class ActivityBO extends ToString {
         this.score = score;
     }
 
-    public int getApplicationStamper() {
+    public Integer getApplicationStamper() {
         return applicationStamper;
     }
 
-    public void setApplicationStamper(int applicationStamper) {
+    public void setApplicationStamper(Integer applicationStamper) {
         this.applicationStamper = applicationStamper;
     }
 

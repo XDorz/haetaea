@@ -136,7 +136,7 @@ public interface ActivityService {
      * @param context
      * @return
      */
-    PageList<ActivityBO> findApproved(ActivityManagerRequest request, OperateContext context) throws ParseException;
+    PageList<ActivityBO> findApproved(ActivityManagerRequest request, OperateContext context);
 
     /**
      * 修改活动的扫章时间

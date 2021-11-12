@@ -528,46 +528,45 @@ public class ActivityController {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+//                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
             }
+
             @Override
-            public Result<PageList<ActivityBO>> execute() throws ParseException {
+            public Result<PageList<ActivityBO>> execute() {
                 OperateContext context = new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
-                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
-                builder.withState("APPROVED");//approve 表示待审核，sql语句自带cancel
+
+                //默认第一页，每页十条
+                int page=1;
+                int limit=10;
+
                 //添加页码
-                if(request.getPage()!=null&&request.getPage()!=0){
-                    builder.withPage(request.getPage());
+                if(request.getPage()!=null&&request.getPage()>0){
+                    page=request.getPage();
                 }
+
                 //添加每页条数
-                if(request.getLimit()!=null&&request.getLimit()!=0){
-                    builder.withLimit(request.getLimit());
+                if(request.getLimit()!=null&&request.getLimit()>0){
+                    limit=request.getLimit();
                 }
-                //添加排序規則
-                if(StringUtils.isBlank(request.getOrderRule())){
-                    builder.withOrderRule(request.getOrderRule());
+                ActivityManagerRequest activityManagerRequest=new ActivityManagerRequest();
+                activityManagerRequest.setUserId(request.getUserId());
+                activityManagerRequest.setPage(page);
+                activityManagerRequest.setLimit(limit);
+                if(request.getActivityName()!=null&&!request.getActivityName().equals("")){
+                    activityManagerRequest.setActivityName(request.getActivityName());
                 }
-                //条件查询（可选）
-                if (StringUtils.isNotBlank(request.getSearchCreatorStuId())) {//获取到的是StuId。通过StuId找UserId
-                    builder.withUserId(request.getSearchCreatorStuId());
+                if(request.getOrganizationMessage()!=null&&!request.getOrganizationMessage().equals("")){
+                    activityManagerRequest.setOrganizationMessage(request.getOrganizationMessage());
                 }
-                // 添加活动名称选择条件
-                if (StringUtils.isNotBlank(request.getActivityName())) {
-                    builder.withActivityName(request.getActivityName());
+                if(request.getActivityStampedStart()!=null&&request.getActivityStampedEnd()!=null){
+                    activityManagerRequest.setActivityStampedTimeStart(request.getActivityStampedStart());
+                    activityManagerRequest.setActivityStampedTimeEnd(request.getActivityStampedEnd());
                 }
-                // 添加举办单位选择条件
-                if (StringUtils.isNotBlank(request.getOrganizationMessage())) {
-                    builder.withOrganizationMessage(request.getOrganizationMessage());
+                if(request.getSearchCreatorStuId()!=null&&!request.getSearchCreatorStuId().equals("")){
+                    activityManagerRequest.setStuId(request.getSearchCreatorStuId());
                 }
-                // 添加开始时间选择条件
-                if (StringUtils.isNotBlank(String.valueOf(request.getActivityStartTime()))) {
-                    builder.withStart(request.getActivityStartTime());
-                }
-                // 添加结束时间选择条件
-                if (StringUtils.isNotBlank(String.valueOf(request.getActivityEndTime()))) {
-                    builder.withEnd( request.getActivityEndTime());
-                }
-                return RestResultUtil.buildSuccessResult(activityService.findApproved(builder.build(), context), "获取已审批通过的活动列表");
+                return RestResultUtil.buildSuccessResult(activityService.findApproved(activityManagerRequest,context),"获取已审批通过的活动列表");
             }
         });
     }

@@ -357,75 +357,23 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public PageList<ActivityBO> findApproved(ActivityManagerRequest request, OperateContext context) throws ParseException {
-        Integer page=0;
-        Integer limit=10;
-        String orderRule="DESC";
-        String stuId = "%" + "" + "%";
-        String activityName = "%" + "" + "%";
-        String organizationMessage = "%" + "" + "%";
-        Long startTime = request.getStart();
-        Long endTime = request.getEnd();
-
-        if(NumberUtils.isNotBlank(request.getPage())){
-            page=request.getPage();
-        }
-        if(NumberUtils.isNotBlank(request.getLimit())){
-            limit=request.getLimit();
-        }
-        if(StringUtils.isNotBlank(request.getOrderRule())){
-            //顺序
-            String asc="ASC";
-            if(asc.equals(request.getOrderRule())){
-                orderRule=asc;
+    public PageList<ActivityBO> findApproved(ActivityManagerRequest request, OperateContext context) {
+//        AssertUtil.assertTrue(userBasicService.verifyPermissionByRoleCode(request.getUserId(),Collections.singletonList(UserRoleCode.GENERAL_MANAGER)),
+//                CommonResultCode.FORBIDDEN,"您不是管理员，无权访问");
+        PageList<ActivityBO> pageList = activityManager.findApprovedActivity(request);
+        List<ActivityBO> content = pageList.getContent();
+        List<ActivityBO> list=new ArrayList<>();
+        for (ActivityBO activityBO : content) {
+            UserInfoBO userInfoBO = userInfoRepoService.queryUserInfoByUserId(activityBO.getCreatorId());
+            if(userInfoBO!=null){
+                activityBO.setStuId(userInfoBO.getStuId());
+                activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMPER_MANAGE.getCode())));
             }
+
+            list.add(activityBO);
         }
-        if(StringUtils.isNotBlank(request.getUserId())){
-            stuId = "%" + request.getUserId() + "%";
-        }
-        if(StringUtils.isNotBlank(request.getActivityName())){
-            activityName = "%" + request.getActivityName() + "%";
-        }
-        if(StringUtils.isNotBlank(request.getOrganizationMessage())){
-            organizationMessage = "%" + request.getOrganizationMessage() + "%";
-        }
-
-        PageList<ActivityBO> activityBOPageList = null;
-        ActivityRequest re = new ActivityRequest();
-
-
-        //有时间
-        if (startTime != null && endTime != null && String.valueOf(startTime).length() !=0 && String.valueOf(endTime).length() !=0 ){
-            re.setState(request.getState());
-            re.setPage(page);
-            re.setLimit(limit);
-            re.setOrderRule(orderRule);
-            re.setStuId(stuId);
-            re.setActivityName(activityName);
-            re.setOrganizationMessage(organizationMessage);
-            re.setActivityStampedTimeStart(startTime);
-            re.setActivityStampedTimeEnd(endTime);
-
-            activityBOPageList = activityManager.findApprovedAddTime(re);
-        }else {//无时间
-            re.setState(request.getState());
-            re.setPage(page);
-            re.setLimit(limit);
-            re.setOrderRule(orderRule);
-            re.setStuId(stuId);
-            re.setActivityName(activityName);
-            re.setOrganizationMessage(organizationMessage);
-            activityBOPageList = activityManager.findApproved(re);
-        }
-
-        activityBOPageList.getContent().forEach(activityBO -> {
-            String userId = activityBO.getCreatorId();
-            String getstuId = userInfoRepoService.queryUserInfoByUserId(userId).getStuId();
-
-            activityBO.setStuId(getstuId);
-        });
-
-        return activityBOPageList;
+        pageList.setContent(list);
+        return pageList;
 
     }
 

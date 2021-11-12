@@ -72,7 +72,7 @@ public class ActivityDO extends BaseDO {
      * 活动申请章数
      */
     @Column(name = "application_stamper")
-    private int applicationStamper;
+    private Integer applicationStamper;
 
     /**
      * 活动描述
@@ -242,10 +242,11 @@ public class ActivityDO extends BaseDO {
         this.score = score;
     }
 
-    public int getApplicationStamper() {
+    public Integer getApplicationStamper() {
         return applicationStamper;
     }
-    public void setApplicationStamper(int applicationStamper) {
+
+    public void setApplicationStamper(Integer applicationStamper) {
         this.applicationStamper = applicationStamper;
     }
 
