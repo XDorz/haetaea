@@ -406,4 +406,5 @@ public class ActivityRestRequest extends RestRequest {
     public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
     }
+
 }

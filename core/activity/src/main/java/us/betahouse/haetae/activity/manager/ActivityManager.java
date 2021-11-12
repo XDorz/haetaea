@@ -142,7 +142,7 @@ public interface ActivityManager {
      * @param request
      * @return
      */
-    List<ActivityDO> findCreatedThisWeekNotPage(ActivityRequest request);
+    List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request);
 
     /**
      * 查找本周创建的活动 分页
@@ -160,8 +160,6 @@ public interface ActivityManager {
     PageList<ActivityBO> findApprovedThisWeek(ActivityRequest request);
     //根据idList查找
 
-
-    PageList<ActivityBO> findByActivityList(ActivityRequest request,List<String> activityIdList);
 
     /**
      * 活动审批通过

@@ -500,7 +500,7 @@ public class UserController {
 
     @GetMapping("/downloadtemplate")
     public Result<String> download(UserRequest request,HttpServletResponse response) {
-        return RestOperateTemplate.operate(LOGGER, "根据excel批量创建用户", request, new RestOperateCallBack<String>() {
+        return RestOperateTemplate.operate(LOGGER, "下载新生模板", request, new RestOperateCallBack<String>() {
             @Override
             public void before() {
                 RestOperateCallBack.super.before();

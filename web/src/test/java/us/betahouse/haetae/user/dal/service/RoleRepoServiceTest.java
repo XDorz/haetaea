@@ -8,7 +8,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import us.betahouse.haetae.serviceimpl.user.enums.UserRoleCode;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,7 +46,10 @@ public class RoleRepoServiceTest {
 
     @Test
     public void userBindRoles() {
-        roleRepoService.userBindRoles("123456789", Collections.singletonList("201811171435334621498500021117"));
+        List list=new ArrayList();
+        list.add("202110030319567600554800021003");
+        list.add("201811302151309605429200021130");
+        roleRepoService.userBindRoles("201811302141073197820001201810", list);
 
     }
 

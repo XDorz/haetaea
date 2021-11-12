@@ -127,13 +127,13 @@ public class PageList<E> {
         this.number=number;
         this.numberOfElements=content.size();
         this.totalPages=(int)((this.totalElements + size - 1)/size);
-        if(number<1){
+        if(number<=1){
             this.number=1;
             this.first=true;
         }else {
             this.first=false;
         }
-        if(number>totalPages){
+        if(number>=totalPages){
             this.number=totalPages;
             this.end=true;
         }else {

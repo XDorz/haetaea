@@ -193,7 +193,7 @@ public interface ActivityService {
      * @param context
      * @return
      */
-    PageList<ActivityBO> findUnQualifiedThisWeek(ActivityManagerRequest request, OperateContext context);
+    List<ActivityBO> findUnQualifiedThisWeek(ActivityManagerRequest request, OperateContext context);
 
     /**
      * 审批通过

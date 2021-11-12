@@ -238,6 +238,7 @@ public class ExcelUtil {
             }
             return returnValue;
         }
+
     /**
      * 创建excel文档
      *
@@ -335,8 +336,8 @@ public class ExcelUtil {
         // 5. 设置response参数
         response.reset(); // 重置response的设置
 //        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+//        response.setHeader("Content-Disposition", "attachment;filename=" + new String((fileName + ".xls").getBytes("gb2312"), "iso-8859-1"));
         response.setContentType("application/octet-stream");
-//        response.setHeader("Content-Disposition", "attachment;filename=" + new String((fileName + ".xls").getBytes(), "iso-8859-1"));
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName,"UTF-8") + ".xls");
         // 6. 创建Servlet 输出流对象
         ServletOutputStream out = response.getOutputStream();
@@ -361,5 +362,5 @@ public class ExcelUtil {
                 bos.close();
         }
     }
-    }
+}
 

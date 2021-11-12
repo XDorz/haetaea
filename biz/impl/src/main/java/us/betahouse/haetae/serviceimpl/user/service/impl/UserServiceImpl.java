@@ -286,6 +286,8 @@ public class UserServiceImpl implements UserService {
         Map<String, PermBO> permBOMap = userBasicService.fetchUserPerms(userId);
         List<String> permTypes = CollectionUtils.toStream(permBOMap.values()).filter(Objects::nonNull).map(PermBO::getPermType).collect(Collectors.toList());
 
+        boolean isManager=userBasicService.verifyPermissionByRoleCode(userId,Collections.singletonList(UserRoleCode.GENERAL_MANAGER));
+
         //活动负责人的模块
         List<UserRoutingTable> activityListA=new ArrayList<>();
 
@@ -296,35 +298,38 @@ public class UserServiceImpl implements UserService {
             activityListA.add(inquiry);
             //放入活动模块
             UserRoutingTable activity=new UserRoutingTable("/activity","活动模块",null,true,activityListA);
-            userRoutingTable.add(activity);
-
+            if(!isManager){
+                userRoutingTable.add(activity);
+            }
             if(permTypes.contains(ActivityPermType.STAMPER_MANAGE)){
                 List<UserRoutingTable> chapterList=new ArrayList<>();
                 UserRoutingTable importTable=new UserRoutingTable("/import","导入章","importChapter",false,null);
                 chapterList.add(importTable);
                 //放入活动章模块
                 UserRoutingTable chapter=new UserRoutingTable("/chapter","活动章模块",null,true,chapterList);
-                userRoutingTable.add(chapter);
+                if(!isManager){
+                    userRoutingTable.add(chapter);
+                }
             }
         }
 
         //管理员
-        if(userBasicService.verifyPermissionByRoleCode(userId,Collections.singletonList(UserRoleCode.GENERAL_MANAGER))){
+        if(isManager){
             //预警与总览模块
             UserRoutingTable overview=new UserRoutingTable("/overview","预警与总览","overview",false,null);
             userRoutingTable.add(overview);
 
             List<UserRoutingTable> activityList=new ArrayList<>();
+            //判断是否两个权限都有
+            if(userBasicService.verifyPermissionByRoleCode(userId,Collections.singletonList(UserRoleCode.ACTIVITY_MANAGER))){
+                activityList.addAll(activityListA);
+            }
             UserRoutingTable approval=new UserRoutingTable("/approval","活动审批","approval",false,null);
             activityList.add(approval);
             UserRoutingTable approveDetail=new UserRoutingTable("/approvedetail","活动审批详情","approvedetail",false,null);
             activityList.add(approveDetail);
             UserRoutingTable authority=new UserRoutingTable("/authority","权限分配","authority",false,null);
             activityList.add(authority);
-            //判断是否两个权限都有
-            if(userBasicService.verifyPermissionByRoleCode(userId,Collections.singletonList(UserRoleCode.ACTIVITY_MANAGER))){
-                activityList.addAll(activityListA);
-            }
             //放入活动模块
             UserRoutingTable activity=new UserRoutingTable("/activity","活动模块",null,true,activityList);
             userRoutingTable.add(activity);

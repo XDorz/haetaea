@@ -157,7 +157,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             "and organization_message like concat('%',?,'%') " +
             "and user_id=(select user_id from common_user_info where stu_id=?) " +
             "and activity_stamped_start>=? and activity_stamped_end<=? " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           String stuId,Date start,Date end,int formIndex,int size);
@@ -172,7 +172,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
             "and activity_stamped_start>=? and activity_stamped_end<=? " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                                       Date start,Date end,int formIndex,int size);
@@ -186,7 +186,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
             "and user_id=(select user_id from common_user_info where stu_id=?) " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           String stuId,int formIndex,int size);
@@ -199,7 +199,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
 
     @Query(value = "select * from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
-            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') " +
+            "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED') order by id desc " +
             "limit ?,?",nativeQuery = true)
     List<ActivityDO> findApprovedActivity(String activityName,String OrganizationName,
                                           int formIndex,int size);
@@ -249,17 +249,10 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @return
      */
     //
-    @Query(value = "select * from activity where gmt_create >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
 
-    /**
-     * 根据活动id列表查询活动
-     * @param pageable
-     * @param activityIdList
-     * @return
-     */
-    Page<ActivityDO> findByActivityIdIn(Pageable pageable,List<String> activityIdList);
 
     /**
      * 本周创建的活动分页查询
@@ -267,7 +260,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param activityName
      * @return
      */
-    @Query(value = "select * from activity where gmt_create >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     Page<ActivityDO> findCreatedThisWeek(Pageable pageable,String activityName);
 
@@ -276,7 +269,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param pageable
      * @return
      */
-    @Query(value = "select * from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and approved_time >=(select subdate(curdate(),date_format(curdate(),'%w')-1)) and activity_name like ?1"
+    @Query(value = "select * from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and approved_time >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     Page<ActivityDO> findApprovedThisWeek(Pageable pageable,String activityName);
 

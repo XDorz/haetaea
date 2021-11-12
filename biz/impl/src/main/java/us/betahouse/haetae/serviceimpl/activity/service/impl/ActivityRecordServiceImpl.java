@@ -310,7 +310,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     }
 
     @Override
-    public List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) {
+    public List<String> exportExcel(ActivityStampRequest request, HttpServletResponse response, OperateContext context) throws IOException {
         ActivityDO activityDO = activityDORepo.findByActivityId(request.getActivityId());
         String fileName = activityDO.getActivityName();
         List<ActivityRecordBO> activityRecordBOList = activityRecordManager.queryByActivityId(request.getActivityId());
