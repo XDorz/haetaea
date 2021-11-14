@@ -104,7 +104,8 @@ public class PermController {
 
             @Override
             public Result<List<PermBO>> execute() {
-                return RestResultUtil.buildSuccessResult(permService.findAllNotContainStamperAndFinance(), "获取专业列表成功");
+//                return RestResultUtil.buildSuccessResult(permService.findAllNotContainStamperAndFinance(), "获取专业列表成功");
+                return null;
             }
         });
     }
@@ -135,6 +136,7 @@ public class PermController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 RoleUserPermRequest roleUserPermRequest = new RoleUserPermRequest();
                 roleUserPermRequest.setPermId(request.getPermId());
+                roleUserPermRequest.setOperateId(request.getUserId());
                 permService.getPermUsers(roleUserPermRequest, context);
                 return RestResultUtil.buildSuccessResult(permService.getPermUsers(roleUserPermRequest, context), "获取该权限所有用户成功");
             }
@@ -201,6 +203,7 @@ public class PermController {
                 RoleUserPermRequest roleUserPermRequest = new RoleUserPermRequest();
                 roleUserPermRequest.setPermId(request.getPermId());
                 roleUserPermRequest.setStuIds(request.getStuIds());
+                roleUserPermRequest.setOperateId(request.getUserId());
                 return RestResultUtil.buildSuccessResult(permService.batchUsersBindPerms(roleUserPermRequest, context), "绑定权限成功");
             }
         });
@@ -232,6 +235,7 @@ public class PermController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 RoleUserPermRequest roleUserPermRequest = new RoleUserPermRequest();
                 roleUserPermRequest.setPermId(request.getPermId());
+                roleUserPermRequest.setOperateId(request.getUserId());
                 permService.detachAllUsers(roleUserPermRequest, context);
                 return RestResultUtil.buildSuccessResult("解绑权限所有用户成功");
             }

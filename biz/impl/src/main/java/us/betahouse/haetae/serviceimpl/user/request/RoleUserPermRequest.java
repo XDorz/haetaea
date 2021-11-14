@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.user.request;
 
+import us.betahouse.haetae.serviceimpl.common.verify.VerifyRequest;
 import us.betahouse.haetae.user.request.RoleManageRequest;
 
 import java.util.List;
@@ -13,8 +14,12 @@ import java.util.Map;
  * @author guofan.cp
  * @version : RoleRequest.java 2019/08/16 10:00 guofan.cp
  */
-public class RoleUserPermRequest extends RoleManageRequest {
+public class RoleUserPermRequest extends RoleManageRequest implements VerifyRequest {
 
+    /**
+     * 操作员id
+     */
+    private String operateId;
 
     /**
      * 角色id
@@ -138,5 +143,18 @@ public class RoleUserPermRequest extends RoleManageRequest {
 
     public void setStuIds(List<String> stuIds) {
         this.stuIds = stuIds;
+    }
+
+    public String getOperateId() {
+        return operateId;
+    }
+
+    public void setOperateId(String operateId) {
+        this.operateId = operateId;
+    }
+
+    @Override
+    public String getVerifyUserId() {
+        return getOperateId();
     }
 }

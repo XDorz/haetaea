@@ -370,7 +370,7 @@ public class ActivityController {
                 String openid =  userService.queryByUserId(request.getAuditId(),context).getOpenId();
                 if (StringUtils.isEmpty(openid))
                     return RestResultUtil.buildSuccessResult(request , "该用户不存在");
-                String token = AccessTokenManage.GetToken();;
+                String token = AccessTokenManage.GetToken();
                 String result = AuditUtil.publishAuditByOpenId(request.getPage(),openid,token,message);
                 if (StringUtils.equals(CommonResultCode.FORBIDDEN.getCode(),result)){
                     return  RestResultUtil.buildSuccessResult(request , "用户未允许订阅该消息");

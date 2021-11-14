@@ -16,7 +16,7 @@ import java.util.List;
  * @author dango.yxm
  * @version : RoleManageRequest.java 2018/11/19 下午3:47 dango.yxm
  */
-public class RoleManageRequest extends BaseRequest {
+public class RoleManageRequest extends BaseRequest{
 
     private static final long serialVersionUID = 2672268693238403447L;
 

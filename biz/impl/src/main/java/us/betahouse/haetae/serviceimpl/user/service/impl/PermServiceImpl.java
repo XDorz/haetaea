@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityPermType;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
+import us.betahouse.haetae.serviceimpl.common.verify.VerifyRole;
 import us.betahouse.haetae.serviceimpl.finance.constant.FinancePermType;
+import us.betahouse.haetae.serviceimpl.user.enums.UserRoleCode;
 import us.betahouse.haetae.serviceimpl.user.request.RoleUserPermRequest;
 import us.betahouse.haetae.serviceimpl.user.service.PermService;
 import us.betahouse.haetae.user.dal.convert.EntityConverter;
@@ -71,6 +73,7 @@ public class PermServiceImpl implements PermService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @VerifyRole(roleCodes = {UserRoleCode.USER_MANAGER})
     public List<UserInfoBO> batchUsersBindPerms(RoleUserPermRequest request, OperateContext context) {
         List<String> useIds = new ArrayList<>();
         List<String> stuids = request.getStuIds();
@@ -112,6 +115,7 @@ public class PermServiceImpl implements PermService {
     }
 
     @Override
+    @VerifyRole(roleCodes = UserRoleCode.USER_MANAGER)
     public void detachAllUsers(RoleUserPermRequest request, OperateContext context) {
         String permId = request.getPermId();
         AssertUtil.assertNotNull(permDORepo.findByPermId(permId), "权限id不存在");
@@ -119,6 +123,7 @@ public class PermServiceImpl implements PermService {
     }
 
     @Override
+    @VerifyRole(roleCodes = UserRoleCode.USER_MANAGER)
     public List<UserInfoBO> getPermUsers(RoleUserPermRequest request, OperateContext context) {
         String permId = request.getPermId();
         AssertUtil.assertNotNull(permDORepo.findByPermId(permId), "权限id不存在");

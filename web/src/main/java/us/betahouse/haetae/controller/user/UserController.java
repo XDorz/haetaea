@@ -4,15 +4,11 @@
  */
 package us.betahouse.haetae.controller.user;
 
-import cn.hutool.core.io.resource.ClassPathResource;
-import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.poi.excel.ExcelUtil;
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import us.betahouse.haetae.common.log.LoggerName;
@@ -39,7 +35,6 @@ import us.betahouse.haetae.user.model.CommonUser;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.haetae.user.model.basic.perm.PermBO;
 import us.betahouse.haetae.user.model.basic.perm.RoleBO;
-import us.betahouse.haetae.user.model.basic.perm.UserBO;
 import us.betahouse.haetae.utils.IPUtil;
 import us.betahouse.haetae.utils.RestResultUtil;
 import us.betahouse.util.common.Result;
@@ -508,12 +503,12 @@ public class UserController {
             @Override
             public Result<String> execute() throws IOException {
 //                String filePath = "classpath:download";
-                String fileName = "xinshenmoban.xlsx";
+                String fileName = "template.xlsx";
 //                File file = new File(filePath + File.separator + fileName);
 //                File file= ResourceUtils.getFile(filePath);
 //                FileInputStream fileInputStream = new FileInputStream(file);
 //                InputStream fis = new BufferedInputStream(fileInputStream);
-                InputStream fis=getClass().getClassLoader().getResourceAsStream("download/xinshenmoban.xlsx");
+                InputStream fis=getClass().getClassLoader().getResourceAsStream("download/template.xlsx");
                 OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
                 try {
                     byte[] buffer = new byte[1024];
