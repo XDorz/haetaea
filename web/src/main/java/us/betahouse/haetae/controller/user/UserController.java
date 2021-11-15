@@ -29,8 +29,10 @@ import us.betahouse.haetae.serviceimpl.user.builder.CommonUserRequestBuilder;
 import us.betahouse.haetae.serviceimpl.user.request.CommonUserRequest;
 import us.betahouse.haetae.serviceimpl.user.request.UploadUserExcelRequest;
 import us.betahouse.haetae.serviceimpl.user.routingtable.UserRoutingTable;
+import us.betahouse.haetae.serviceimpl.user.service.RoleService;
 import us.betahouse.haetae.serviceimpl.user.service.UserService;
 import us.betahouse.haetae.user.dal.service.PermRepoService;
+import us.betahouse.haetae.user.dal.service.RoleRepoService;
 import us.betahouse.haetae.user.model.CommonUser;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.haetae.user.model.basic.perm.PermBO;
@@ -80,6 +82,9 @@ public class UserController {
 
     @Autowired
     private PermRepoService permRepoService;
+
+    @Autowired
+    private RoleRepoService roleRepoService;
     /**
      * 登陆
      *
@@ -113,6 +118,13 @@ public class UserController {
                 organizationRequest.setMemberId(userVO.getUserId());
                 List<String> list= CollectionUtils.toStream(organizationService.queryOrganizationMemberByMemberId(organizationRequest)).map(OrganizationMemberBO::findJob).distinct().collect(Collectors.toList());
                 userVO.setJobInfo(list);
+
+                CommonUserRequest commonUserRequest=new CommonUserRequest();
+                commonUserRequest.setUserId(userVO.getUserId());
+                List<String> roleIds=CollectionUtils.toStream(userService.fetchUserRoles(commonUserRequest,context).values()).map(RoleBO::getRoleId).collect(Collectors.toList());
+                List<String> rolePermNames = CollectionUtils.toStream(permRepoService.batchQueryPermByRoleId(roleIds)).map(PermBO::getPermName).collect(Collectors.toList());
+                userVO.setRoleInfo(rolePermNames);
+
                 return RestResultUtil.buildSuccessResult(userVO, "登陆成功");
             }
         });
@@ -145,6 +157,13 @@ public class UserController {
                 organizationRequest.setMemberId(userVO.getUserId());
                 List<String> list= CollectionUtils.toStream(organizationService.queryOrganizationMemberByMemberId(organizationRequest)).map(OrganizationMemberBO::findJob).distinct().collect(Collectors.toList());
                 userVO.setJobInfo(list);
+
+                CommonUserRequest commonUserRequest=new CommonUserRequest();
+                commonUserRequest.setUserId(userVO.getUserId());
+                List<String> roleIds=CollectionUtils.toStream(userService.fetchUserRoles(commonUserRequest,context).values()).map(RoleBO::getRoleId).collect(Collectors.toList());
+                List<String> rolePermNames = CollectionUtils.toStream(permRepoService.batchQueryPermByRoleId(roleIds)).map(PermBO::getPermName).collect(Collectors.toList());
+                userVO.setRoleInfo(rolePermNames);
+
                 return RestResultUtil.buildSuccessResult(userVO, "登陆成功");
             }
         });
@@ -204,8 +223,14 @@ public class UserController {
                 OrganizationRequest organizationRequest=new OrganizationRequest();
                 organizationRequest.setMemberId(userVO.getUserId());
 
-                List<String> list= CollectionUtils.toStream(organizationService.queryOrganizationMemberByMemberId(organizationRequest)).map(OrganizationMemberBO::findJob).distinct().collect(Collectors.toList());
-                userVO.setJobInfo(list);
+//                List<String> list= CollectionUtils.toStream(organizationService.queryOrganizationMemberByMemberId(organizationRequest)).map(OrganizationMemberBO::findJob).distinct().collect(Collectors.toList());
+//                userVO.setJobInfo(list);
+                CommonUserRequest commonUserRequest=new CommonUserRequest();
+                commonUserRequest.setUserId(userVO.getUserId());
+                List<String> roleIds=CollectionUtils.toStream(userService.fetchUserRoles(commonUserRequest,context).values()).map(RoleBO::getRoleId).collect(Collectors.toList());
+                List<String> rolePermNames = CollectionUtils.toStream(permRepoService.batchQueryPermByRoleId(roleIds)).map(PermBO::getPermName).collect(Collectors.toList());
+                userVO.setRoleInfo(rolePermNames);
+
 
                 Cookie cookie = new Cookie("UserToken", userVO.getToken());
 

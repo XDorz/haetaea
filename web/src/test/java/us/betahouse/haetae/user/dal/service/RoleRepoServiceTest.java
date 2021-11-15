@@ -51,16 +51,13 @@ public class RoleRepoServiceTest {
         List list=new ArrayList();
         list.add("202110030319567600554800021003");
         list.add("201811302151309605429200021130");
-        roleRepoService.userBindRoles("201811302141075339490001201806", list);
+        roleRepoService.userBindRoles("202010081759412065830001202026", list);
     }
 
     @Test
     public void userBindAllrole(){
         List list=roleRepoService.findAllRole().stream().map(RoleBO::getRoleId).collect(Collectors.toList());
-        roleRepoService.userBindRoles("201811302141075339490001201806", list);
-        roleRepoService.userBindRoles("201811302141076993210001201805", list);
-        roleRepoService.userBindRoles("201811302141072472920001201808", list);
-        roleRepoService.userBindRoles("201811302141078170400001201840", list);
+        roleRepoService.userBindRoles("202010081759412065830001202026", list);
     }
 
     @Test

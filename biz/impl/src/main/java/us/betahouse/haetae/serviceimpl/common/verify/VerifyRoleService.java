@@ -39,7 +39,7 @@ public class VerifyRoleService {
         Object[] args = joinPoint.getArgs();
         VerifyRequest request=null;
         for (Object arg : args) {
-            if(arg instanceof VerifyRole){
+            if(arg instanceof VerifyRequest){
                 request=(VerifyRequest) arg;
             }
         }
@@ -60,7 +60,7 @@ public class VerifyRoleService {
         }
         boolean flag=userBasicService.verifyPermissionByRoleCode(request.getVerifyUserId(),roleCode);
         if(!flag){
-            LOGGER.warn(MessageFormat.format("存在越权操作，越权用户id{0}",request.getVerifyUserId()));
+            LOGGER.warn(MessageFormat.format("存在越权操作，越权用户id:{0}",request.getVerifyUserId()));
             throw new BetahouseException(CommonResultCode.FORBIDDEN,MessageFormat.format("存在越权操作，越权用户id{0}",request.getVerifyUserId()));
         }
     }
