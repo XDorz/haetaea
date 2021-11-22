@@ -4,6 +4,8 @@
  */
 package us.betahouse.haetae.activity.dal.service.impl;
 
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,9 +28,12 @@ import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.activity.request.ActivityRequest;
 import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.exceptions.BetahouseException;
+import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 import us.betahouse.util.utils.LoggerUtil;
 
+import java.io.InputStream;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,6 +74,28 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
                 .filter(Objects::nonNull)
                 .map(this::convert)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> queryAllOrganization() {
+        InputStream fis=getClass().getClassLoader().getResourceAsStream("download/organization.xlsx");
+        ExcelReader excelReader;
+        try {
+            excelReader = ExcelUtil.getReader(fis);
+        } catch (Exception e) {
+            throw new BetahouseException(CommonResultCode.FORBIDDEN,"文件读取错误");
+        }
+        AssertUtil.assertBigger(2, excelReader.getRowCount(), CommonResultCode.FORBIDDEN.getCode(), "文件不得少于两行信息，本次批量导入未进行");
+        List<List<Object>> read = excelReader.read(0, excelReader.getRowCount());
+        List<String> header = new ArrayList<>(Arrays.asList("组织名称"));
+        AssertUtil.assertTrue(header.equals(read.get(0)), CommonResultCode.FORBIDDEN, MessageFormat.format("表头格式错误，正确模板为{0}", header));
+        read.remove(0);
+
+        List<String> notStampStuIds = new ArrayList<>();
+        for (List<Object> objects : read) {
+            notStampStuIds.add(String.valueOf(objects.get(0)));
+        }
+        return notStampStuIds;
     }
 
     @Override

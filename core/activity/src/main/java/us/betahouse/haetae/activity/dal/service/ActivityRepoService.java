@@ -28,6 +28,13 @@ public interface ActivityRepoService {
     List<ActivityBO> queryAllActivity();
 
     /**
+     * 查询所有活动举办单位
+     *
+     * @return
+     */
+    List<String> queryAllOrganization();
+
+    /**
      * 通过状态查询活动
      *
      * @param state 狀態

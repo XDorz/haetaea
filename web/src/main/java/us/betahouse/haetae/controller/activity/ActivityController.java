@@ -245,6 +245,34 @@ public class ActivityController {
     }
 
     /**
+     * (新)获取所有活动举办单位
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+//    @CheckLogin
+    @GetMapping(value = "/neworganizers")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<String>> newGetOrganizers(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "(新)获取所有活动举办单位", request, new RestOperateCallBack<List<String>>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+//                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
+            @Override
+            public Result<List<String>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                return RestResultUtil.buildSuccessResult(activityRepoService.queryAllOrganization(), "(新)获取所有活动举办单位成功");
+            }
+        });
+    }
+
+    /**
      * 操作活动
      *
      * @param request
