@@ -251,7 +251,7 @@ public class ActivityController {
      * @param httpServletRequest
      * @return
      */
-//    @CheckLogin
+    @CheckLogin
     @GetMapping(value = "/neworganizers")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<List<String>> newGetOrganizers(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
@@ -260,7 +260,7 @@ public class ActivityController {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
-//                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
             }
 
             @Override
