@@ -674,7 +674,7 @@ public class UserController {
         });
     }
 
-    //@CheckLogin
+    @CheckLogin
     @GetMapping(value = "/unQualified/undergraduate")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<PageList<UserInfoBO>> getUnQualified1(UserRequest request) {
@@ -698,7 +698,7 @@ public class UserController {
         });
     }
 
-    //@CheckLogin
+    @CheckLogin
     @GetMapping(value = "/unQualified/collegeUpgrade")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<PageList<UserInfoBO>> getUnQualified2(UserRequest request, HttpServletRequest httpServletRequest) {
@@ -722,7 +722,7 @@ public class UserController {
         });
     }
 
-    //每天凌晨两点半执行
+    //每天凌晨两点半刷新未合格标志
     @Scheduled(cron = "0 30 2 * * ?")
     @PutMapping("update/unqualified")
     public void updateUnqualified(){
