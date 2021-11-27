@@ -9,6 +9,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import us.betahouse.haetae.user.dal.convert.EntityConverter;
 import us.betahouse.haetae.user.dal.model.UserInfoDO;
@@ -18,6 +21,7 @@ import us.betahouse.haetae.user.dal.repo.perm.UserDORepo;
 import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
 import us.betahouse.haetae.user.idfactory.BizIdFactory;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
+import us.betahouse.haetae.user.model.common.PageList;
 import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 
@@ -140,5 +144,70 @@ public class UserInfoRepoServiceImpl implements UserInfoRepoService {
                 .map(EntityConverter::majorConvert)
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getGrade() + ";" + o.getMajor()))), ArrayList::new));
         return userInfoBOS;
+    }
+
+    @Override
+    public void updateUndergraduateState() {
+        userInfoDORepo.update21600();
+        userInfoDORepo.update16000();
+        userInfoDORepo.update0801();
+        userInfoDORepo.update0810();
+        userInfoDORepo.update2011();
+        userInfoDORepo.update8001();
+        userInfoDORepo.update8010();
+        userInfoDORepo.update8800();
+    }
+
+    @Override
+    public void updateCollegeUpgradeState() {
+        userInfoDORepo.update411();
+    }
+
+    @Override
+    public PageList<UserInfoBO> findUnQualifiedUndergraduate(Integer page, Integer limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<UserInfoDO> list = userInfoDORepo.findUnQualifiedUndergraduate(pageable);
+        List<UserInfoBO> userInfoBOS = convert(list.getContent());
+        for (UserInfoBO userInfoBO : userInfoBOS) {
+            final String userId = userInfoBO.getUserId();
+            userInfoBO.setLectureChapterNum(userInfoDORepo.getLectureStampNumByUserId(userId));
+            userInfoBO.setActivityChapterNum(userInfoDORepo.getActivityStampNumByUserId(userId));
+            userInfoBO.setPracticeTimes(userInfoDORepo.getPracticeTimesByUserId(userId));
+            userInfoBO.setCertificatesNum(userInfoDORepo.getCertificateNumByUserId(userId));
+        }
+        return new PageList<>(userInfoBOS,list.getTotalElements(),list.getPageable().getPageNumber(),list.getPageable().getPageSize());
+    }
+
+    @Override
+    public PageList<UserInfoBO> findUnQualifiedCollegeUpgrade(Integer page, Integer limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<UserInfoDO> list = userInfoDORepo.findUnQualifiedCollegeUpgrade(pageable);
+        List<UserInfoBO> userInfoBOS = convert(list.getContent());
+        for (UserInfoBO userInfoBO : userInfoBOS) {
+            final String userId = userInfoBO.getUserId();
+            userInfoBO.setLectureChapterNum(userInfoDORepo.getLectureStampNumByUserId(userId));
+            userInfoBO.setActivityChapterNum(userInfoDORepo.getActivityStampNumByUserId(userId));
+            userInfoBO.setPracticeTimes(userInfoDORepo.getPracticeTimesByUserId(userId));
+            userInfoBO.setCertificatesNum(userInfoDORepo.getCertificateNumByUserId(userId));
+        }
+        return new PageList<>(userInfoBOS,list.getTotalElements(),list.getPageable().getPageNumber(),list.getPageable().getPageSize());
+    }
+
+
+    public List<UserInfoBO> convert(List<UserInfoDO> userInfoDOS){
+        return CollectionUtils.toStream(userInfoDOS).filter(Objects::nonNull).map(this::convert).collect(Collectors.toList());
+    }
+
+    private UserInfoBO convert(UserInfoDO userInfoDO){
+        if (userInfoDO == null){
+            return null;
+        }
+        UserInfoBO userInfoBO = new UserInfoBO();
+        userInfoBO.setUserId(userInfoDO.getUserId());
+        userInfoBO.setStuId(userInfoDO.getStuId());
+        userInfoBO.setRealName(userInfoDO.getRealName());
+        userInfoBO.setMajor(userInfoDO.getMajorId());
+        userInfoBO.setClassId(userInfoDO.getClassId());
+        return userInfoBO;
     }
 }

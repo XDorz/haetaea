@@ -71,14 +71,24 @@ public class UserInfoBO extends ToString {
     private String avatarUrl;
 
     /**
-     * 辅导员姓名
+     * 活动章数
      */
-    private String counsellorName;
+    private int activityChapterNum;
 
     /**
-     * 联系方式
+     * 讲座章数
      */
-    private String phoneNumber;
+    private int lectureChapterNum;
+
+    /**
+     * 实践次数
+     */
+    private int practiceTimes;
+
+    /**
+     * 证书数
+     */
+    private int certificatesNum;
 
 
     /**
@@ -86,20 +96,36 @@ public class UserInfoBO extends ToString {
      */
     private Map<String, String> extInfo = new HashMap<>();
 
-    public String getCounsellorName() {
-        return counsellorName;
+    public int getActivityChapterNum() {
+        return activityChapterNum;
     }
 
-    public void setCounsellorName(String counsellorName) {
-        this.counsellorName = counsellorName;
+    public void setActivityChapterNum(int activityChapterNum) {
+        this.activityChapterNum = activityChapterNum;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public int getLectureChapterNum() {
+        return lectureChapterNum;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setLectureChapterNum(int lectureChapterNum) {
+        this.lectureChapterNum = lectureChapterNum;
+    }
+
+    public int getPracticeTimes() {
+        return practiceTimes;
+    }
+
+    public void setPracticeTimes(int practiceTimes) {
+        this.practiceTimes = practiceTimes;
+    }
+
+    public int getCertificatesNum() {
+        return certificatesNum;
+    }
+
+    public void setCertificatesNum(int certificatesNum) {
+        this.certificatesNum = certificatesNum;
     }
 
     public String getAvatarUrl() {

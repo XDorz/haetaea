@@ -83,37 +83,24 @@ public class UserInfoDO extends BaseDO {
     private Date enrollDate;
 
     /**
+     * 可以毕业的标志
+     * 普通本科：1
+     * 专升本：2
+     */
+    private String qualified;
+
+    /**
      * 拓展信息
      */
     @Column(length = 2000)
     private String extInfo;
 
-    /**
-     * 辅导员姓名
-     */
-    @Column(name = "counsellor_name",length = 50)
-    private String counsellorName;
-
-    /**
-     * 联系方式
-     */
-    @Column(length = 50)
-    private String phoneNumber;
-
-    public String getCounsellorName() {
-        return counsellorName;
+    public String getQualified() {
+        return qualified;
     }
 
-    public void setCounsellorName(String counsellorName) {
-        this.counsellorName = counsellorName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setQualified(String qualified) {
+        this.qualified = qualified;
     }
 
     public String getUserInfoId() {

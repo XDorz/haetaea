@@ -5,6 +5,7 @@
 package us.betahouse.haetae.user.dal.service;
 
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
+import us.betahouse.haetae.user.model.common.PageList;
 
 import java.util.List;
 
@@ -65,13 +66,38 @@ public interface UserInfoRepoService {
      */
     List<UserInfoBO> queryAllUser();
 
-
     /**
      * 获取所有年级和专业
      *
      * @return
      */
     List<UserInfoBO> queryAllMajorAndGrade();
+
+    /**
+     *更新大四普通本科学生的达标状态
+     */
+    void updateUndergraduateState();
+
+    /**
+     *更新大四专升本学生的达标状态
+     */
+    void updateCollegeUpgradeState();
+
+    /**
+     * 查询大四普通本科未达标学生信息 分页
+     * @param page
+     * @param limit
+     * @return
+     */
+    PageList<UserInfoBO> findUnQualifiedUndergraduate(Integer page, Integer limit);
+
+    /**
+     * 查询大四专升本未达标学生信息 分页
+     * @param page
+     * @param limit
+     * @return
+     */
+    PageList<UserInfoBO> findUnQualifiedCollegeUpgrade(Integer page,Integer limit);
 
 
 

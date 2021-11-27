@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import us.betahouse.haetae.common.log.LoggerName;
@@ -33,10 +34,12 @@ import us.betahouse.haetae.serviceimpl.user.service.RoleService;
 import us.betahouse.haetae.serviceimpl.user.service.UserService;
 import us.betahouse.haetae.user.dal.service.PermRepoService;
 import us.betahouse.haetae.user.dal.service.RoleRepoService;
+import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
 import us.betahouse.haetae.user.model.CommonUser;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.haetae.user.model.basic.perm.PermBO;
 import us.betahouse.haetae.user.model.basic.perm.RoleBO;
+import us.betahouse.haetae.user.model.common.PageList;
 import us.betahouse.haetae.utils.IPUtil;
 import us.betahouse.haetae.utils.RestResultUtil;
 import us.betahouse.util.common.Result;
@@ -85,6 +88,10 @@ public class UserController {
 
     @Autowired
     private RoleRepoService roleRepoService;
+
+    @Autowired
+    private UserInfoRepoService userInfoRepoService;
+
     /**
      * 登陆
      *
@@ -651,7 +658,7 @@ public class UserController {
     @CheckLogin
     @GetMapping(value = "/routingtable")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<List<UserRoutingTable>> getRoutingTable(UserRequest request, HttpServletRequest httpServletRequest) {
+    public Result<List<UserRoutingTable>> getRoutingTable(UserRequest request) {
         return RestOperateTemplate.operate(LOGGER, "拉取路由表", request, new RestOperateCallBack<List<UserRoutingTable>>() {
             @Override
             public void before() {
@@ -665,6 +672,62 @@ public class UserController {
                 return RestResultUtil.buildSuccessResult(routingTable,"拉取路由表成功");
             }
         });
+    }
+
+    //@CheckLogin
+    @GetMapping(value = "/unQualified/undergraduate")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<UserInfoBO>> getUnQualified1(UserRequest request) {
+        return RestOperateTemplate.operate(LOGGER, "查询大四普通本科未达毕业要求学生信息", request, new RestOperateCallBack<PageList<UserInfoBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<PageList<UserInfoBO>> execute() {
+                Integer limit = request.getLimit();
+                Integer page = request.getPage();
+                if(limit==null){
+                    limit=5;
+                }
+                if (page==null){
+                    page=0;
+                }
+                return RestResultUtil.buildSuccessResult(userInfoRepoService.findUnQualifiedUndergraduate(page,limit),"查询大四普通本科未达毕业要求学生成功");
+            }
+        });
+    }
+
+    //@CheckLogin
+    @GetMapping(value = "/unQualified/collegeUpgrade")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<UserInfoBO>> getUnQualified2(UserRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "查询大四专升本未达毕业要求学生信息", request, new RestOperateCallBack<PageList<UserInfoBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<PageList<UserInfoBO>> execute() {
+                Integer limit = request.getLimit();
+                Integer page = request.getPage();
+                if(limit==null){
+                    limit=5;
+                }
+                if (page==null){
+                    page=0;
+                }
+                return RestResultUtil.buildSuccessResult(userInfoRepoService.findUnQualifiedCollegeUpgrade(page,limit),"查询大四专升本未达毕业要求学生成功");
+            }
+        });
+    }
+
+    //每天凌晨两点半执行
+    @Scheduled(cron = "0 30 2 * * ?")
+    @PutMapping("update/unqualified")
+    public void updateUnqualified(){
+        userInfoRepoService.updateUndergraduateState();
+        userInfoRepoService.updateCollegeUpgradeState();
     }
 }
 
