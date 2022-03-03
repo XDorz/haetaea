@@ -402,7 +402,12 @@ public class ActivityServiceImpl implements ActivityService {
                 activityBO.setStuId(userInfoBO.getStuId());
                 activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMPER_MANAGE.getCode())));
             }
-
+            if(activityBO.getActivityStampedStart()==null&&activityBO.getActivityStampedEnd()==null){
+                if(activityBO.getStart()!=null&&activityBO.getEnd()!=null){
+                    activityBO.setActivityStampedStart(activityBO.getStart());
+                    activityBO.setActivityStampedEnd(activityBO.getEnd());
+                }
+            }
             list.add(activityBO);
         }
         pageList.setContent(list);

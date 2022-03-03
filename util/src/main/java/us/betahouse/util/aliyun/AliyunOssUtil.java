@@ -6,6 +6,7 @@ package us.betahouse.util.aliyun;
 
 
 import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.utils.IOUtils;
 import com.aliyun.oss.model.*;
 import org.apache.commons.lang.StringUtils;
@@ -114,7 +115,7 @@ public class AliyunOssUtil {
         OSSClient ossClient = null;
         try {
             // Create OSS instance
-            ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+            ossClient =new OSSClient(endpoint, accessKeyId, accessKeySecret);
 
             // Create bucket if not exists
             if (!ossClient.doesBucketExist(bucketName)) {

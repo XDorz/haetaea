@@ -71,6 +71,11 @@ final public class CommonUserRequestBuilder {
     private UserInfoBO userInfoBO;
 
     /**
+     * 被操作对象id
+     */
+    private String operateId;
+
+    /**
      * 绑定的角色ids
      */
     List<String> roleIds = new ArrayList<>();
@@ -107,6 +112,7 @@ final public class CommonUserRequestBuilder {
         request.setExtInfo(extInfo);
         request.setToken(token);
         request.setStuId(stuId);
+        request.setOperateId(operateId);
         return request;
     }
 
@@ -180,6 +186,11 @@ final public class CommonUserRequestBuilder {
 
     public CommonUserRequestBuilder withToken(String token) {
         this.token = token;
+        return this;
+    }
+
+    public CommonUserRequestBuilder withOperateId(String operateId) {
+        this.operateId = operateId;
         return this;
     }
 }

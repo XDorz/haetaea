@@ -641,15 +641,16 @@ public class UserController {
                     request.setOperatedId(commonUser.getUserId());
                 }
                 CommonUserRequestBuilder builder=CommonUserRequestBuilder.getInstance()
-                        .withUserId(request.getOperatedId());
+                        .withUserId(request.getUserId())
+                        .withOperateId(request.getOperatedId());
                 OperateContext context=new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 if(request.isCanStamp()){
                     userService.giveStamperPerm(builder.build(),context);
-                    return RestResultUtil.buildFailResult("给予权限成功");
+                    return RestResultUtil.buildSuccessResult("给予权限成功");
                 }else {
                     userService.unBindStamperPerm(builder.build(),context);
-                    return RestResultUtil.buildFailResult("解绑权限成功");
+                    return RestResultUtil.buildSuccessResult("解绑权限成功");
                 }
             }
         });
@@ -658,7 +659,7 @@ public class UserController {
     @CheckLogin
     @GetMapping(value = "/routingtable")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<List<UserRoutingTable>> getRoutingTable(UserRequest request) {
+    public Result<List<UserRoutingTable>> getRoutingTable(UserRequest request,HttpServletRequest httpServletRequest) {
         return RestOperateTemplate.operate(LOGGER, "拉取路由表", request, new RestOperateCallBack<List<UserRoutingTable>>() {
             @Override
             public void before() {
@@ -677,7 +678,7 @@ public class UserController {
     @CheckLogin
     @GetMapping(value = "/unQualified/undergraduate")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<PageList<UserInfoBO>> getUnQualified1(UserRequest request) {
+    public Result<PageList<UserInfoBO>> getUnQualified1(UserRequest request,HttpServletRequest httpServletRequest) {
         return RestOperateTemplate.operate(LOGGER, "查询大四普通本科未达毕业要求学生信息", request, new RestOperateCallBack<PageList<UserInfoBO>>() {
             @Override
             public void before() {

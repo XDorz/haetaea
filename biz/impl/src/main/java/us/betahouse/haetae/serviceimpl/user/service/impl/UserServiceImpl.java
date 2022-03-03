@@ -19,6 +19,7 @@ import us.betahouse.haetae.serviceimpl.activity.enums.ActivityPermTypeEnum;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.constant.UserRequestExtInfoKey;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyPerm;
+import us.betahouse.haetae.serviceimpl.common.verify.VerifyRole;
 import us.betahouse.haetae.serviceimpl.user.constant.GeneralPermType;
 import us.betahouse.haetae.serviceimpl.user.constant.UserPermType;
 import us.betahouse.haetae.serviceimpl.user.enums.GeneralManagerPermTypeEnum;
@@ -364,12 +365,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @VerifyPerm(permType = {GeneralPermType.PERM_OPERATOR})
+//    @VerifyPerm(permType = {GeneralPermType.PERM_OPERATOR})
+    @VerifyRole(roleCodes = {UserRoleCode.GENERAL_MANAGER})
     public void giveStamperPerm(CommonUserRequest request, OperateContext context) {
+        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMPER_MANAGE)),"该用户已有导章权限，不必给予");
         PermBO permBO = permRepoService.queryPermByPermType(ActivityPermType.STAMPER_MANAGE);
         AssertUtil.assertNotNull(permBO,CommonResultCode.SYSTEM_ERROR.getCode(),"查无导章权限");
         UserManageRequest userManageRequest=new UserManageRequest();
-        userManageRequest.setUserId(request.getUserId());
+        userManageRequest.setUserId(request.getOperateId());
         userManageRequest.setPermIds(Collections.singletonList(permBO.getPermId()));
         userManager.batchBindPerm(userManageRequest);
     }
@@ -380,11 +383,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @VerifyPerm(permType = {GeneralPermType.PERM_OPERATOR})
+//    @VerifyPerm(permType = {GeneralPermType.PERM_OPERATOR})
+    @VerifyRole(roleCodes = {UserRoleCode.GENERAL_MANAGER})
     public void unBindStamperPerm(CommonUserRequest request, OperateContext context) {
+        AssertUtil.assertTrue(!userBasicService.verifyPermissionByRoleCode(request.getOperateId(),Collections.singletonList(UserRoleCode.GENERAL_MANAGER)),"无法取消总管理导章权限");
+        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMPER_MANAGE)),"该用户没有导章权限,不必取消");
         PermBO permBO = permRepoService.queryPermByPermType(ActivityPermTypeEnum.STAMPER_MANAGE.getCode());
         AssertUtil.assertNotNull(permBO,CommonResultCode.SYSTEM_ERROR.getCode(),"查无导章权限");
-        permRepoService.userUnbindPerms(request.getUserId(),Collections.singletonList(permBO.getPermId()));
+        permRepoService.userUnbindPerms(request.getOperateId(),Collections.singletonList(permBO.getPermId()));
     }
 
 }

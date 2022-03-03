@@ -335,9 +335,7 @@ public class PermRepoServiceImpl implements PermRepoService {
             LoggerUtil.error(LOGGER, "绑定的权限id不存在 permIds={0}, permDOList={1}", permIds, permDOList);
             throw new BetahouseException(CommonResultCode.ILLEGAL_PARAMETERS.getCode(), "绑定的权限id不存在");
         }
-
         userPermRelationDORepo.deleteByUserIdAndPermIdIn(userId, permIds);
-
     }
 
     @Override

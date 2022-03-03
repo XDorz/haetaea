@@ -75,6 +75,11 @@ public class UserManageRequest extends BaseRequest {
      * 绑定的权限码
      */
     private RoleCode roleCode;
+
+    /**
+     * 被操作对象id
+     */
+    private String operateId;
     
     public String getAvatarUrl() {
         return avatarUrl;
@@ -158,6 +163,14 @@ public class UserManageRequest extends BaseRequest {
 
     public RoleCode getRoleCode() {
         return roleCode;
+    }
+
+    public String getOperateId() {
+        return operateId;
+    }
+
+    public void setOperateId(String operateId) {
+        this.operateId = operateId;
     }
 
     public void setRoleCode(RoleCode roleCode) {
