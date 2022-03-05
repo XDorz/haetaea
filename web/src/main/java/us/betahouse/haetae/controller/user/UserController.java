@@ -647,10 +647,10 @@ public class UserController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 if(request.isCanStamp()){
                     userService.giveStamperPerm(builder.build(),context);
-                    return RestResultUtil.buildSuccessResult("给予权限成功");
+                    return RestResultUtil.buildSuccessResult("给予权限成功，学号："+request.getStuId());
                 }else {
                     userService.unBindStamperPerm(builder.build(),context);
-                    return RestResultUtil.buildSuccessResult("解绑权限成功");
+                    return RestResultUtil.buildSuccessResult("解绑权限成功,学号："+request.getStuId());
                 }
             }
         });

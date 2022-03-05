@@ -49,9 +49,9 @@ public class RoleRepoServiceTest {
     @Test
     public void userBindRoles() {
         List list=new ArrayList();
-        list.add("202203022148538829474200020302");
+        list.add("201811302151309605429200021130");
 //        list.add("202203022148553536190100020302");
-        roleRepoService.userBindRoles("202010081759406486820001202026", list);
+        roleRepoService.userBindRoles("202010081759429403170001202006", list);
     }
 
     @Test

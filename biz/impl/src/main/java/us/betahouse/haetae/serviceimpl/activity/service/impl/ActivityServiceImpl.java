@@ -49,10 +49,7 @@ import us.betahouse.util.utils.NumberUtils;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 活动服务实现
@@ -335,7 +332,7 @@ public class ActivityServiceImpl implements ActivityService {
         String orderRule="DESC";
 
         if(NumberUtils.isNotBlank(request.getPage())){
-            page=request.getPage();
+            page=request.getPage()-1;
         }
         if(NumberUtils.isNotBlank(request.getLimit())){
             limit=request.getLimit();
@@ -500,7 +497,9 @@ public class ActivityServiceImpl implements ActivityService {
         //1970
         Long startTime = 0L;
         //现在
-        Long endTime = new Date().getTime();
+        Calendar calendar=Calendar.getInstance();
+        calendar.add(Calendar.YEAR,10);
+        Long endTime = calendar.getTimeInMillis();
         if (request.getActivityStampedTimeStart()!=null){
             startTime = request.getActivityStampedTimeStart();
         }
