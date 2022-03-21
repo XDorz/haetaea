@@ -22,6 +22,10 @@ public enum IdTypeEnum {
      */
     Activity_Record_ID("1002", "活动记录id"),
 
+    /**
+     * 青年大学习记录id
+     */
+    Youth_Learning_Record_ID("1003","青年大学习记录ID"),
 
     /**
      * 履历id

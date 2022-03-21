@@ -6,6 +6,8 @@ package us.betahouse.util.template;
 
 import us.betahouse.util.common.Result;
 
+import java.io.IOException;
+
 /**
  * 操作模板
  *
@@ -19,7 +21,7 @@ public interface OperateCallBack<T> {
 
     ;
 
-    Result<T> execute();
+    Result<T> execute() throws IOException;
 
     default void after() {
     }

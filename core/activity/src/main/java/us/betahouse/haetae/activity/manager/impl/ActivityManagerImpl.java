@@ -183,7 +183,7 @@ public class ActivityManagerImpl implements ActivityManager {
 
     @Override
     public PageList<ActivityBO> findApprovedActivity(ActivityRequest request) {
-        int page=1;
+        int page=0;
         int size=10;
         String activityName="";
         String organizationName="";
@@ -204,7 +204,7 @@ public class ActivityManagerImpl implements ActivityManager {
                 //全都传入值的情况
                 List<ActivityDO> approvedActivities = activityDORepo.findApprovedActivity(activityName, organizationName, request.getStuId(),
                         new Date(request.getActivityStampedTimeStart()), new Date(request.getActivityStampedTimeEnd()),
-                        page * size-size, size);
+                        page * size, size);
                 Long totalEle=activityDORepo.findApprovedActivityNum(activityName, organizationName, request.getStuId(),
                         new Date(request.getActivityStampedTimeStart()), new Date(request.getActivityStampedTimeEnd()));
                 return new PageList(activityRepoService.convert(approvedActivities),totalEle,page,size);
@@ -218,14 +218,14 @@ public class ActivityManagerImpl implements ActivityManager {
             //未传入stuId的情况
             List<ActivityDO> approvedActivities = activityDORepo.findApprovedActivity(activityName, organizationName,
                     new Date(request.getActivityStampedTimeStart()), new Date(request.getActivityStampedTimeEnd()),
-                    page * size-size, size);
+                    page * size, size);
             Long totalEle=activityDORepo.findApprovedActivityNum(activityName, organizationName,
                     new Date(request.getActivityStampedTimeStart()), new Date(request.getActivityStampedTimeEnd()));
             return new PageList(activityRepoService.convert(approvedActivities),totalEle,page,size);
         }else {
             //两个都未传入的情况
             List<ActivityDO> approvedActivities = activityDORepo.findApprovedActivity(activityName, organizationName,
-                    page * size-size, size);
+                    page * size, size);
             Long totalEle=activityDORepo.findApprovedActivityNum(activityName, organizationName);
             return new PageList(activityRepoService.convert(approvedActivities),totalEle,page,size);
         }

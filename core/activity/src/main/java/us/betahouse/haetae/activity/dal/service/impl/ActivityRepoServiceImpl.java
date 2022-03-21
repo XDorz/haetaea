@@ -7,7 +7,6 @@ package us.betahouse.haetae.activity.dal.service.impl;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,23 +14,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import us.betahouse.haetae.activity.builder.ActivityBOBuilder;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.dal.model.PastActivityDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.PastActivityDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
+import us.betahouse.haetae.activity.idfactory.BizIdFactoryImpl;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
-import us.betahouse.haetae.activity.request.ActivityRequest;
 import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.exceptions.BetahouseException;
 import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 import us.betahouse.util.utils.LoggerUtil;
 
+import javax.annotation.Resource;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -59,6 +58,7 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
      * id工厂
      */
     @Autowired
+//    @Qualifier("activityBizFactory")
     private BizIdFactory activityBizFactory;
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -142,7 +142,8 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         if (StringUtils.isBlank(activityBO.getActivityId())) {
             activityBO.setActivityId(activityBizFactory.getActivityId());
         }
-        return convert(activityDORepo.save(convert(activityBO)));
+        ActivityDO convert = convert(activityBO);
+        return convert(activityDORepo.save(convert));
     }
 
     /**
@@ -511,8 +512,8 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         activityDO.setActivityStampedEnd(activityBO.getActivityStampedEnd());
         activityDO.setCancelReason(activityBO.getCancelReason());
         activityDO.setApprovedTime(activityBO.getApprovedTime());
-        activityBO.setModified(activityBO.getModified());
-        activityBO.setPictureUrl(activityBO.getPictureUrl());
+        activityDO.setModified(activityBO.getModified());
+        activityDO.setPictureUrl(activityBO.getPictureUrl());
         activityDO.setExtInfo(JSON.toJSONString(activityBO.getExtInfo()));
         return activityDO;
     }

@@ -19,6 +19,7 @@ import us.betahouse.haetae.activity.dal.model.ActivityRecordDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.ActivityRecordDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
+import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
@@ -275,7 +276,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
                 continue;
             }
             request.setScannerUserId("201812010040554783180001201835");
-            request.setStatus("ENABLE");
+            request.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
             request.setTerm(activityBO.getTerm());
             List<String> inList = new ArrayList<>();
             inList.add(userInfoBO.getUserId());

@@ -18,31 +18,34 @@ import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.ActivityRecordDORepo;
 import us.betahouse.haetae.activity.dal.repo.PastActivityDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
+import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
 import us.betahouse.haetae.activity.manager.ActivityRecordManager;
 import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
+import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.certificate.dal.model.QualificationsDO;
 import us.betahouse.haetae.certificate.dal.repo.QualificationsDORepo;
 import us.betahouse.haetae.serviceimpl.activity.constant.GradesConstant;
 import us.betahouse.haetae.serviceimpl.activity.manager.StampManager;
 import us.betahouse.haetae.serviceimpl.activity.model.ActivityRecordStatistics;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityStampRequest;
+import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
+import us.betahouse.haetae.serviceimpl.activity.service.impl.YouthLearningServiceImpl;
 import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
 import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.util.utils.CsvUtil;
 import us.betahouse.util.utils.DateUtil;
+import us.betahouse.util.utils.HttpDownloadUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -822,5 +825,83 @@ public class ActivityRecordServiceTest {
             BigDecimal ans=(BigDecimal)map.get(key)[No];
             return ans.longValue();
         }
+    }
+
+    @Test
+    private void YouthLearningRecord(){
+//        try {
+//            String[][] values = CsvUtil.getWithHeader(file.getInputStream());
+//            int stuClass=-1,stuId=-1,finishTime=-1,activityName=-1;
+//            for (int i = 0; i < values[0].length; i++) {
+//                switch (values[0][i]){
+//                    case "单位/班级/社区（村）":
+//                        stuClass=i;
+//                        break;
+//                    case "学号/卡号/工号":
+//                        stuId=i;
+//                        break;
+//                    case "学习时间":
+//                        finishTime=i;
+//                        break;
+//                    case "课程":
+//                        activityName=i;
+//                        break;
+//                }
+//            }
+//            if(stuId==-1||finishTime==-1||activityName==-1||stuClass==-1){
+//                HttpDownloadUtil.downloadByValue("result.txt","您上传的表格数据不完整,正确格式包含以下：学号/卡号/工号,单位/班级/社区（村）,完成时间,课程",response);
+//                return null;
+//            }
+//            List<YouthLearningBO> youthLearningBOS=new ArrayList<>();
+//            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm");
+//            for (int i = 1; i < values.length; i++) {
+//                String stuid="";
+//                for (int j = 0; j < values[i][stuId].length(); j++) {
+//                    char c = values[i][stuId].charAt(j);
+//                    if(c>='0'&&c<='9') stuid+=String.valueOf(c);
+//                }
+//                YouthLearningBO youthLearningBO=new YouthLearningBO();
+//                youthLearningBO.setScannerUserId(request.getUserId());
+//                youthLearningBO.setType(ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode());
+//                youthLearningBO.setTerm(TermUtil.getNowTerm());
+//                youthLearningBO.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
+//                youthLearningBO.setActivityName(values[i][activityName]);
+//                youthLearningBO.setUserId(userService.findByStuid(stuid).getUserId());
+//                youthLearningBO.setFinishTime(simpleDateFormat.parse(values[i][finishTime]));
+//                youthLearningBO.setClassId(values[i][stuClass]);
+//                youthLearningBOS.add(youthLearningBO);
+//            }
+//            List<YouthLearningBO> fails=null;
+//            YouthLearningServiceImpl.Info info=null;
+//            if(youthLearningBOS.size()>0){
+//                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+//                youthLearningRequest.setYouthLearningBOList(youthLearningBOS);
+//                info = youthLearningService.batchSaveRecord(youthLearningRequest);
+//            }else {
+//                HttpDownloadUtil.downloadByValue("result.txt","您上传的表格没有任何数据",response);
+//                return null;
+//            }
+//            if(info.getRepeat().size()==0){
+//                HttpDownloadUtil.downloadByValue("result.txt","导入成功 :) \n"+info.getInfo(),response);
+//                return null;
+//            }
+//            ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+//            CsvWriter csvWriter=new CsvWriter(outputStream,',', StandardCharsets.UTF_8);
+//            csvWriter.writeRecord(new String[]{"学号/卡号/工号","单位/班级/社区（村）", "课程","学习时间"});
+//            for (int i = 0; i < info.getRepeat().size(); i++) {
+//                YouthLearningBO youthLearningBO = info.getRepeat().get(i);
+//                String sId=youthLearningBO.getStuId()==null?"":youthLearningBO.getStuId();
+//                String name=youthLearningBO.getRealName()==null?"":youthLearningBO.getRealName();
+//                String clsid=youthLearningBO.getClassId()==null?"":youthLearningBO.getClassId();
+//                csvWriter.writeRecord(new String[]{sId+" "+name,clsid,youthLearningBO.getActivityName(),simpleDateFormat.format(youthLearningBO.getFinishTime())});
+//            }
+//            ByteArrayInputStream infoStream=new ByteArrayInputStream(info.getInfo().toString().getBytes());
+//            ByteArrayInputStream resultStream=new ByteArrayInputStream(outputStream.toByteArray());
+//            HttpDownloadUtil.downloadInputStreamZIP("结果.zip",response,"result.txt",resultStream,"info.txt",infoStream);
+//            return null;
+//        } catch (IOException | ParseException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 }

@@ -6,6 +6,9 @@ package us.betahouse.util.utils;
 
 import com.csvreader.CsvReader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,56 @@ public class CsvUtil {
     public static String[][] getWithHeader(String filePath, char delimiter, String charset) {
         try {
             CsvReader csvReader = new CsvReader(filePath, delimiter, Charset.forName(charset));
+            return getValue(csvReader);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 从输入流读取csv
+     *
+     * @param inputStream
+     * @param delimiter
+     * @param charset
+     * @return
+     */
+    public static String[][] getWithHeader(InputStream inputStream,char delimiter, String charset){
+        CsvReader csvReader = new CsvReader(inputStream, delimiter, Charset.forName(charset));
+        return getValue(csvReader);
+    }
+
+    /**
+     * 从输入流读取csv
+     *
+     * @param inputStream
+     * @param charset
+     * @return
+     */
+    public static String[][] getWithHeader(InputStream inputStream, Charset charset){
+        CsvReader csvReader = new CsvReader(inputStream, DELIMITER, charset);
+        return getValue(csvReader);
+    }
+
+    /**
+     * 从输入流读取csv
+     *
+     * @param inputStream
+     * @return
+     */
+    public static String[][] getWithHeader(InputStream inputStream){
+        CsvReader csvReader = new CsvReader(inputStream, DELIMITER, Charset.forName(CHARSET));
+        return getValue(csvReader);
+    }
+
+    /**
+     * 将csv文件转为二维数组（含Header）
+     *
+     * @return
+     */
+    public static String[][] getValue(CsvReader csvReader) {
+        try {
             csvReader.readHeaders();
             List<String[]> resultList = new ArrayList<>();
             resultList.add(csvReader.getHeaders());

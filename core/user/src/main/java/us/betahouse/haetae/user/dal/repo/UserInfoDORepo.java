@@ -33,12 +33,29 @@ public interface UserInfoDORepo extends JpaRepository<UserInfoDO, Long> {
     UserInfoDO findByUserId(String userId);
 
     /**
+     * 根据班级和姓名查找
+     *
+     * @param realName
+     * @param classId
+     * @return
+     */
+    List<UserInfoDO> findAllByRealNameAndClassId(String realName,String classId);
+
+    /**
      * 通过过学号获取用户信息实体
      *
      * @param stuId
      * @return
      */
     UserInfoDO findByStuId(String stuId);
+
+    /**
+     * 通过过班级号获取用户信息实体
+     *
+     * @param
+     * @return
+     */
+    List<UserInfoDO> findAllByClassId(String classId);
 
     /**
      * 批量获取用户信息

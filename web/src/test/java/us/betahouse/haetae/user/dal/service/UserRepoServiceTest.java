@@ -28,7 +28,7 @@ public class UserRepoServiceTest {
 
     @Test
     public void updateUser() {
-        String stuId="209050728";
+        String stuId="209050730";
         UserBO userBO = userRepoService.queryByUserName(stuId);
         userBO.setPassword(EncryptUtil.encryptPassword("Hziee"+stuId, userBO.getSalt()));
         userRepoService.updateUserByUserId(userBO);

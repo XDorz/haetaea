@@ -6,6 +6,7 @@ package us.betahouse.haetae.activity.idfactory;
 
 import org.springframework.stereotype.Service;
 
+
 /**
  * 业务id生成工厂
  * 生成32位业务id
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author MessiahJK
  * @version : BizldFactory.java 2018/11/17 17:26 MessiahJK
  */
-@Service("activityBizFactory")
+@Service(value = "activityBizFactory")
 public interface BizIdFactory {
 
     /**
@@ -57,4 +58,10 @@ public interface BizIdFactory {
      * @return
      */
     String getActivityBlacklistId();
+
+    /**
+     * 生成青年大学习活动记录id
+     * @return
+     */
+    String getYouthLearningRecordId();
 }

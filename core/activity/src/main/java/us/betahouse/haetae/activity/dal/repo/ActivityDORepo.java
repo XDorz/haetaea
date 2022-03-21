@@ -80,6 +80,15 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     ActivityDO findByActivityName(String activityName);
 
     /**
+     * 查找特定状态活动
+     *
+     * @param activityName
+     * @param state
+     * @return
+     */
+    ActivityDO findAllByActivityNameAndStateNot(String activityName,String state);
+
+    /**
      * 通过学期、状态、类型分页查询 倒序
      *
      * @param pageable 分页工具
@@ -179,7 +188,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
 
     @Query(value = "select count(id) from activity where activity_name like concat('%',?,'%') " +
             "and organization_message like concat('%',?,'%') " +
-            "and activity_stamped_start>=? and activity_stamped_end<=? " +
+            "and activity_stamped_start >= ? and activity_stamped_end <= ? " +
             "and activity_id in (select activity_id from activity where state='FINISHED' or state='PUBLISHED' or state='RESTARTED')",nativeQuery = true)
     Long findApprovedActivityNum(String activityName,String OrganizationName,Date start,Date end);
 

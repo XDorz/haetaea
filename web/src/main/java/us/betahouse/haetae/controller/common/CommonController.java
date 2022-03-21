@@ -17,7 +17,9 @@ import us.betahouse.haetae.common.session.CheckLogin;
 import us.betahouse.haetae.common.template.RestOperateCallBack;
 import us.betahouse.haetae.common.template.RestOperateTemplate;
 import us.betahouse.haetae.controller.user.UserController;
+import us.betahouse.haetae.serviceimpl.common.verify.VerifyRole;
 import us.betahouse.haetae.serviceimpl.schedule.manager.AccessTokenManage;
+import us.betahouse.haetae.serviceimpl.user.enums.UserRoleCode;
 import us.betahouse.haetae.utils.RestResultUtil;
 import us.betahouse.util.aliyun.AliyunOssUtil;
 import us.betahouse.util.common.Result;
@@ -28,6 +30,7 @@ import us.betahouse.util.utils.HttpUtils;
 import us.betahouse.util.wechat.WeChatAccessTokenUtil;
 import us.betahouse.util.wechat.WeChatShareImgUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -94,7 +97,7 @@ public class CommonController {
      */
     @PostMapping("/aliyun/ding")
     @ResponseBody
-    public Result<Map> uploadImgAliyunOSSDing(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+    public Result<Map> uploadImgAliyunOSSDing(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest request) throws IOException {
         return RestOperateTemplate.operate(LOGGER, "用户文件上传", null, new RestOperateCallBack<Map>() {
             @Override
             public Result<Map> execute() throws IOException {

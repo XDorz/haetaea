@@ -5,6 +5,8 @@
 package us.betahouse.haetae.activity.model.common;
 
 import org.springframework.data.domain.Page;
+import us.betahouse.haetae.activity.dal.model.YouthLearningDO;
+import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.util.utils.PageUtil;
 
 import java.util.Collection;
@@ -62,6 +64,7 @@ public class PageList<E> {
     private List<E> content;
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     private void init(Page<?> page, Function convert) {
         this.totalElements = page.getTotalElements();
         this.totalPages = page.getTotalPages();
@@ -159,11 +162,13 @@ public class PageList<E> {
     }
 
     /**
-     * Page<V> ->PageList<T>
+     * 该方法以被优化，在新版本不建议使用
      *
+     * 优化详情请见 {@link #PageList(Function,Page)}
      * @param page    org.springframework.data.domain.page jpa分页类
      * @param convert 类型转换函数
      */
+    @Deprecated
     public PageList(Page<?> page, Function convert) {
         this.init(page, convert);
     }
@@ -235,5 +240,40 @@ public class PageList<E> {
             return Stream.empty();
         }
         return collection.stream();
+    }
+
+
+    /**
+     * 对带function的init的优化
+     *
+     * @author xxj
+     * @param page
+     * @param convert
+     * @param <T>
+     */
+    public <T> void superInit(Page<T> page, Function<T,E> convert){
+        this.totalElements = page.getTotalElements();
+        this.totalPages = page.getTotalPages();
+        this.size = page.getSize();
+        this.number = page.getNumber();
+        this.numberOfElements = page.getNumberOfElements();
+        this.first = page.isFirst();
+        this.end = page.isLast();
+        this.content =toStream(page.getContent())
+                .filter(Objects::nonNull)
+                .map(convert)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 此后建议使用这个构造函数进行带转换的初始化
+     *
+     * @author xxj
+     * @param function
+     * @param page
+     * @param <T> page中内涵的原始数据类型
+     */
+    public <T> PageList(Function<T,E> function,Page<T> page){
+        superInit(page,function);
     }
 }

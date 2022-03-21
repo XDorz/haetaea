@@ -16,7 +16,7 @@ import java.util.Date;
  * @author MessiahJK
  * @version : BizIdFactoryImpl.java 2018/11/17 17:32 MessiahJK
  */
-@Service("activityBizIdFactory")
+@Service
 public class BizIdFactoryImpl implements BizIdFactory {
 
     /**
@@ -124,6 +124,21 @@ public class BizIdFactoryImpl implements BizIdFactory {
         builder.append(getRandNum(8));
         // 24-28 业务码 4位业务码
         builder.append(IdTypeEnum.Activity_Blacklist_ID.getBizNum());
+        // 28-32 业务自定义码
+        builder.append(DateUtil.getYear(now));
+        return builder.toString();
+    }
+
+    @Override
+    public String getYouthLearningRecordId() {
+        StringBuilder builder = new StringBuilder(32);
+        Date now = new Date();
+        // 1-16 系统时间 16位
+        builder.append(DateUtil.getShortDatesStr(now));
+        // 16-24 随机数 8位随机数
+        builder.append(getRandNum(8));
+        // 24-28 业务码 4位业务码
+        builder.append(IdTypeEnum.Youth_Learning_Record_ID.getBizNum());
         // 28-32 业务自定义码
         builder.append(DateUtil.getYear(now));
         return builder.toString();

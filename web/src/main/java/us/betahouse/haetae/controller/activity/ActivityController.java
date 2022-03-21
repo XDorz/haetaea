@@ -6,16 +6,21 @@ package us.betahouse.haetae.controller.activity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.csvreader.CsvWriter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
+import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
+import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.manager.ActivityManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.common.log.LoggerName;
 import us.betahouse.haetae.common.session.CheckLogin;
@@ -24,13 +29,17 @@ import us.betahouse.haetae.common.template.RestOperateTemplate;
 import us.betahouse.haetae.model.activity.PastActivityVO;
 import us.betahouse.haetae.model.activity.request.ActivityRestRequest;
 import us.betahouse.haetae.model.activity.request.AuditRestRequest;
+import us.betahouse.haetae.model.activity.request.YouthLearnRequest;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityCreatorId;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityExtInfoKey;
 import us.betahouse.haetae.serviceimpl.activity.enums.ActivityOperationEnum;
 import us.betahouse.haetae.serviceimpl.activity.model.AuditMessage;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityManagerRequest;
+import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
 import us.betahouse.haetae.serviceimpl.activity.request.builder.ActivityManagerRequestBuilder;
 import us.betahouse.haetae.serviceimpl.activity.service.ActivityService;
+import us.betahouse.haetae.serviceimpl.activity.service.YouthLearningService;
+import us.betahouse.haetae.serviceimpl.activity.service.impl.YouthLearningServiceImpl;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.utils.AuditUtil;
 import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
@@ -46,15 +55,20 @@ import us.betahouse.util.common.Result;
 import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.enums.RestResultCode;
 import us.betahouse.util.log.Log;
-import us.betahouse.util.utils.AssertUtil;
-import us.betahouse.util.utils.CollectionUtils;
-import us.betahouse.util.utils.DateUtil;
-import us.betahouse.util.utils.PageUtil;
+import us.betahouse.util.template.OperateCallBack;
+import us.betahouse.util.template.OperateTemplate;
+import us.betahouse.util.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,6 +105,9 @@ public class ActivityController {
 
     @Autowired
     private PermRepoService permRepoService;
+
+    @Autowired
+    private YouthLearningService youthLearningService;
     /**
      * 添加活动
      *
@@ -98,7 +115,7 @@ public class ActivityController {
      * @param httpServletRequest
      * @return
      */
-    @CheckLogin
+//    @CheckLogin
     @PostMapping
     //添加活动时设置modified默认为false
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -427,12 +444,12 @@ public class ActivityController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
 
                 //默认第一页，每页十条
-                int page=1;
+                int page=0;
                 int limit=10;
 
                 //添加页码
                 if(request.getPage()!=null&&request.getPage()>0){
-                    page=request.getPage();
+                    page=request.getPage()-1;
                 }
 
                 //添加每页条数
@@ -1035,4 +1052,240 @@ public class ActivityController {
         });
     }
 
+    @CheckLogin
+    @PostMapping(value = "/youthlearning/batchsave")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<Void> batchSave(YouthLearnRequest request, @PathVariable("file") MultipartFile file, HttpServletRequest httpServletRequest, HttpServletResponse response){
+        return RestOperateTemplate.operate(LOGGER, "批量记录青年大学习情况", httpServletRequest, new RestOperateCallBack<Void>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(file,RestResultCode.ILLEGAL_PARAMETERS.getCode(),"请上传相应csv文件");
+            }
+
+            @Override
+            public Result<Void> execute(){
+                try {
+                    String[][] values = CsvUtil.getWithHeader(file.getInputStream(),StandardCharsets.UTF_8);
+                    int stuClass=-1,stuId=-1,finishTime=-1,activityName=-1;
+                    for (int i = 0; i < values[0].length; i++) {
+                        switch (values[0][i]){
+                            case "单位/班级/社区（村）":
+                                stuClass=i;
+                                break;
+                            case "学号/卡号/工号":
+                                stuId=i;
+                                break;
+                            case "学习时间":
+                                finishTime=i;
+                                break;
+                            case "课程":
+                                activityName=i;
+                                break;
+                        }
+                    }
+                    if(stuId==-1||finishTime==-1||activityName==-1||stuClass==-1){
+                        HttpDownloadUtil.downloadByValue("result.txt","您上传的表格数据不完整,正确格式包含以下：学号/卡号/工号,单位/班级/社区（村）,完成时间,课程",response);
+                        return RestResultUtil.buildFailResult();
+                    }
+                    List<YouthLearningBO> youthLearningBOS=new ArrayList<>();
+                    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm");
+                    for (int i = 1; i < values.length; i++) {
+                        String stuid="";
+                        for (int j = 0; j < values[i][stuId].length(); j++) {
+                            char c = values[i][stuId].charAt(j);
+                            if(c>='0'&&c<='9') stuid+=String.valueOf(c);
+                        }
+                        YouthLearningBO youthLearningBO=new YouthLearningBO();
+                        youthLearningBO.setScannerUserId(request.getUserId());
+                        youthLearningBO.setType(ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode());
+                        youthLearningBO.setTerm(TermUtil.getNowTerm());
+                        youthLearningBO.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
+                        youthLearningBO.setActivityName(values[i][activityName]);
+                        youthLearningBO.setFinishTime(simpleDateFormat.parse(values[i][finishTime]));
+                        youthLearningBO.setClassId(values[i][stuClass]);
+                        youthLearningBO.setStuId(values[i][stuId]);
+                        youthLearningBOS.add(youthLearningBO);
+                    }
+                    List<YouthLearningBO> fails=null;
+                    YouthLearningServiceImpl.Info info=null;
+                    if(youthLearningBOS.size()>0){
+                        YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                        youthLearningRequest.setYouthLearningBOList(youthLearningBOS);
+                        youthLearningRequest.setUserId(request.getUserId());
+                        info = youthLearningService.batchSaveRecord(youthLearningRequest);
+                    }else {
+                        HttpDownloadUtil.downloadByValue("result.txt","您上传的表格没有任何数据",response);
+                        return RestResultUtil.buildFailResult();
+                    }
+                    if(info.getRepeat().size()==0&&info.getInfo().length()==0){
+                        HttpDownloadUtil.downloadByValue("result.txt","导入成功 :) \n"+info.getInfo(),response);
+                        return RestResultUtil.buildSuccessResult();
+                    }
+                    ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+                    CsvWriter csvWriter=new CsvWriter(outputStream,',', StandardCharsets.UTF_8);
+                    csvWriter.writeRecord(new String[]{"学号/卡号/工号","单位/班级/社区（村）", "课程","学习时间"});
+                    for (int i = 0; i < info.getRepeat().size(); i++) {
+                        YouthLearningBO youthLearningBO = info.getRepeat().get(i);
+                        String sId=youthLearningBO.getStuId()==null?"":youthLearningBO.getStuId();
+                        String name=youthLearningBO.getRealName()==null?"":youthLearningBO.getRealName();
+                        String clsid=youthLearningBO.getClassId()==null?"":youthLearningBO.getClassId();
+                        csvWriter.writeRecord(new String[]{sId+" "+name,clsid,youthLearningBO.getActivityName(),simpleDateFormat.format(youthLearningBO.getFinishTime())});
+                    }
+                    csvWriter.flush();
+                    csvWriter.close();
+                    ByteArrayInputStream infoStream=new ByteArrayInputStream(info.getInfo().toString().getBytes());
+                    ByteArrayInputStream resultStream=new ByteArrayInputStream(outputStream.toByteArray());
+                    HttpDownloadUtil.downloadInputStreamZIP("result.zip",response,"sheet.csv",resultStream,"info.txt",infoStream);
+                    return RestResultUtil.buildFailResult();
+                } catch (IOException | ParseException e) {
+                    e.printStackTrace();
+                }
+                return RestResultUtil.buildFailResult();
+            }
+        });
+    }
+
+    @CheckLogin
+    @GetMapping(value = "/youthlearning/byuserid")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<YouthLearningBO>> youthLearningByUserId(YouthLearnRequest request,HttpServletRequest httpServletRequest){
+        return OperateTemplate.operate(LOGGER, "获取该用户参加的所有青年大学习活动", request, new OperateCallBack<List<YouthLearningBO>>() {
+            @Override
+            public Result<List<YouthLearningBO>> execute() {
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(youthLearningService.getRecordByUserId(youthLearningRequest));
+            }
+        });
+    }
+
+    @CheckLogin
+    @GetMapping(value = "/youthlearning/byuseridnum")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<Integer> youthLearningByUserIdNum(YouthLearnRequest request,HttpServletRequest httpServletRequest){
+        return OperateTemplate.operate(LOGGER, "获取该用户参加的所有青年大学习活动的数量", request, new OperateCallBack<Integer>() {
+            @Override
+            public Result<Integer> execute() {
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(youthLearningService.getRecordNumByUserId(youthLearningRequest));
+            }
+        });
+    }
+
+    @CheckLogin
+    @DeleteMapping(value = "/youthlearning/delete")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<Void> deleteYouthLearning(YouthLearnRequest request,HttpServletRequest httpServletRequest,MultipartFile file,HttpServletResponse response){
+        return OperateTemplate.operate(LOGGER, "盖章员删除某人的学习记录", request, new OperateCallBack<Void>() {
+            @Override
+            public Result<Void> execute() throws IOException {
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setUserId(request.getUserId());
+                if(request.getStuId()!=null&&request.getActivityName()!=null){
+                    YouthLearningBO youthLearningBO=new YouthLearningBO();
+                    youthLearningBO.setActivityName(request.getActivityName());
+                    youthLearningBO.setStuId(request.getStuId());
+                    youthLearningRequest.setYouthLearningBOList(new ArrayList<>(Collections.singletonList(youthLearningBO)));
+                }else if(file!=null){
+                    String[][] values = CsvUtil.getWithHeader(file.getInputStream(),StandardCharsets.UTF_8);
+                    int stuId=-1,activityName=-1;
+                    for (int i = 0; i < values[0].length; i++) {
+                        switch (values[0][i]){
+                            case "学号":
+                                stuId=i;
+                                break;
+                            case "活动名称":
+                                activityName=i;
+                                break;
+                        }
+                    }
+                    if(stuId==-1||activityName==-1){
+                        HttpDownloadUtil.downloadByValue("result.txt","您上传的表格数据不完整,正确格式包含以下：学号,活动名称",response);
+                        return RestResultUtil.buildFailResult();
+                    }
+                    List<YouthLearningBO> youthLearningBOList=new ArrayList<>();
+                    for (int i = 1; i < values.length; i++) {
+                        YouthLearningBO youthLearningBO=new YouthLearningBO();
+                        youthLearningBO.setStuId(values[i][stuId]);
+                        youthLearningBO.setActivityName(values[i][activityName]);
+                        youthLearningBOList.add(youthLearningBO);
+                    }
+                    youthLearningRequest.setYouthLearningBOList(youthLearningBOList);
+                }else {
+                    HttpDownloadUtil.downloadByValue("result.txt","请在活动名称，学号 和 表格之间至少上传一个",response);
+                    return RestResultUtil.buildFailResult();
+                }
+                List<YouthLearningBO> fails = youthLearningService.batchDeleteRecord(youthLearningRequest);
+                if(fails.size()==0){
+                    HttpDownloadUtil.downloadByValue("success.txt","删除章成功 :) ",response);
+                    return RestResultUtil.buildSuccessResult();
+                }else {
+                    ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+                    CsvWriter writer=new CsvWriter(outputStream,',',StandardCharsets.UTF_8);
+                    writer.writeRecord(new String[]{"学号","活动名称"});
+                    for (YouthLearningBO fail : fails) {
+                        writer.writeRecord(new String[]{fail.getStuId(),fail.getActivityName()});
+                    }
+                    writer.write("以上为查找不到大学习记录或者已经被删除该记录的名单，重新导入请将此行删除",true);
+                    writer.flush();
+                    writer.close();
+                    ByteArrayInputStream inputStream=new ByteArrayInputStream(outputStream.toByteArray());
+                    HttpDownloadUtil.downloadByInputStream("result.csv",inputStream,response);
+                    return RestResultUtil.buildSuccessResult();
+                }
+            }
+        });
+    }
+
+    @CheckLogin
+    @PostMapping(value = "/youthlearning/add")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<String> addYouthLearnRecord(YouthLearnRequest request,HttpServletRequest httpServletRequest){
+        return OperateTemplate.operate(LOGGER, "管理员单独添加记录", request, new OperateCallBack<String>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request.getActivityName(),"请填入活动名称");
+                AssertUtil.assertNotNull(request.getStuId(),"请填入被加入学生学号");
+                AssertUtil.assertNotNull(request.getFinishTime(),"请填入完成时间");
+            }
+
+            @Override
+            public Result<String> execute() {
+                YouthLearningBO youthLearningBO=new YouthLearningBO();
+                youthLearningBO.setStuId(request.getStuId());
+                youthLearningBO.setActivityName(request.getActivityName());
+                youthLearningBO.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
+                youthLearningBO.setTerm(TermUtil.getNowTerm());
+                youthLearningBO.setType(ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode());
+                youthLearningBO.setScannerUserId(request.getUserId());
+                youthLearningBO.setFinishTime(new Date(request.getFinishTime()));
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setYouthLearningBO(youthLearningBO);
+                youthLearningRequest.setUserId(request.getUserId());
+                youthLearningService.saveRecord(youthLearningRequest);
+                return RestResultUtil.buildSuccessResult("加入成功");
+            }
+        });
+    }
+
+    @CheckLogin
+    @PostMapping(value = "/youthlearning/search")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<YouthLearningBO>> youthLearningSearch(YouthLearnRequest request,HttpServletRequest httpServletRequest){
+        return OperateTemplate.operate(LOGGER, "盖章员查询某期大学习和某人学习情况", request, new OperateCallBack<PageList<YouthLearningBO>>() {
+            @Override
+            public Result<PageList<YouthLearningBO>> execute() {
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setUserId(request.getUserId());
+                youthLearningRequest.setStuId(request.getStuId());
+                youthLearningRequest.setActivityName(request.getActivityName());
+                youthLearningRequest.setPage(request.getPage());
+                youthLearningRequest.setSize(request.getSize());
+                youthLearningRequest.setClassId(request.getClassId());
+                return RestResultUtil.buildSuccessResult(youthLearningService.getByActivityNameAndUserName(youthLearningRequest));
+            }
+        });
+    }
 }
