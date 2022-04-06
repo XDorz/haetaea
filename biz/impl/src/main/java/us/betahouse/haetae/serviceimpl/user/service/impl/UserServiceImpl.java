@@ -297,6 +297,10 @@ public class UserServiceImpl implements UserService {
 
             UserRoutingTable inquiry=new UserRoutingTable("/inquiry","活动查询与创建","inquiry",false,null);
             activityListA.add(inquiry);
+
+            UserRoutingTable youthLearn=new UserRoutingTable("/youthquery","大学习记录查询","youthquery",false,null);
+            activityListA.add(youthLearn);
+
             //放入活动模块
             UserRoutingTable activity=new UserRoutingTable("/activity","活动模块",null,true,activityListA);
             if(!isManager){
