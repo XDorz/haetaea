@@ -7,6 +7,7 @@ package us.betahouse.haetae.controller.activity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.csvreader.CsvWriter;
+import com.mysql.cj.xdevapi.JsonArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ import us.betahouse.haetae.model.activity.PastActivityVO;
 import us.betahouse.haetae.model.activity.request.ActivityRestRequest;
 import us.betahouse.haetae.model.activity.request.AuditRestRequest;
 import us.betahouse.haetae.model.activity.request.YouthLearnRequest;
+import us.betahouse.haetae.organization.dal.model.OrganizationDO;
+import us.betahouse.haetae.organization.dal.repo.OrganizationRepo;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityCreatorId;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityExtInfoKey;
 import us.betahouse.haetae.serviceimpl.activity.enums.ActivityOperationEnum;
@@ -43,6 +46,7 @@ import us.betahouse.haetae.serviceimpl.activity.service.impl.YouthLearningServic
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.utils.AuditUtil;
 import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
+import us.betahouse.haetae.serviceimpl.organization.service.OrganizationService;
 import us.betahouse.haetae.serviceimpl.schedule.manager.AccessTokenManage;
 import us.betahouse.haetae.serviceimpl.user.request.PermRequest;
 import us.betahouse.haetae.serviceimpl.user.service.PermService;
@@ -108,6 +112,9 @@ public class ActivityController {
 
     @Autowired
     private YouthLearningService youthLearningService;
+
+    @Autowired
+    private OrganizationRepo organizationRepo;
     /**
      * 添加活动
      *
@@ -257,6 +264,37 @@ public class ActivityController {
                 // 去重
                 List<String> out = organizers.stream().distinct().collect(Collectors.toList());
                 return RestResultUtil.buildSuccessResult(JSONArray.parseArray(JSON.toJSONString(out)), "获取所有活动举办单位成功");
+            }
+        });
+    }
+
+    /**
+     * 获取所有活动举办单位
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/organizers/all")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<JSONArray> getOrganizer(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "获取所有活动举办单位", request, new RestOperateCallBack<JSONArray>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
+            @Override
+            public Result<JSONArray> execute() {
+                List<OrganizationDO> all = organizationRepo.findAll();
+                List<String> list=new ArrayList<>();
+                for (int i = 0; i < all.size(); i++) {
+                    list.add(all.get(i).getOrganizationName());
+                }
+                return RestResultUtil.buildSuccessResult(JSONArray.parseArray(JSON.toJSONString(list)),"获取所有活动举办单位成功");
             }
         });
     }

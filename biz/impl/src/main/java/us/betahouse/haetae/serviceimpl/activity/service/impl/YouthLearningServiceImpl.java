@@ -54,6 +54,7 @@ public class YouthLearningServiceImpl implements YouthLearningService {
         List<YouthLearningBO> youthLearningBOList = request.getYouthLearningBOList();
         Info info = remove(youthLearningBOList);
         youthLearningRepoService.batchSaveRecord(youthLearningBOList);
+        info.setInfo(info.getInfo().append(MessageFormat.format("本次共计导入【{0}】条数据",youthLearningBOList.size())));
         return info;
     }
 
@@ -168,42 +169,52 @@ public class YouthLearningServiceImpl implements YouthLearningService {
         youthLearningBO.setStuId(sid);
         youthLearningBO.setRealName(name);
         UserInfoDO userInfoDO=null;
-        if(name.equals("")&&sid.equals("")){
-            info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 未曾找到学号或者姓名，无法比较,可在另一文件中查看\n",String.valueOf(j))));
+//        if(name.equals("")&&sid.equals("")){
+//            info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 未曾找到学号或者姓名，无法比较,可在另一文件中查看\n",String.valueOf(j))));
+//            return false;
+//        }else if(classId.equals("")){
+//            info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 未填写班级,无法比较,可在另一文件中查看\n",String.valueOf(j))));
+//            return false;
+//        }else if(!name.equals("")&&!sid.equals("")){
+//            userInfoDO = userInfoDORepo.findByStuId(sid);
+//            if(userInfoDO==null){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与姓名不匹配，查无此记录,可在另一文件中查看\n",String.valueOf(j))));
+//                return false;
+//            }
+//            if(!name.equals(userInfoDO.getRealName())){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与姓名不匹配，填写姓名【{1}】 实际姓名可能为【{2}】,可在另一文件中查看\n",String.valueOf(j),name,userInfoDO.getRealName())));
+//                return false;
+//            }
+//        }else if(!sid.equals("")){
+//            userInfoDO = userInfoDORepo.findByStuId(sid);
+//            if(userInfoDO==null){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号不存在，查无此记录,可在另一文件中查看\n",String.valueOf(j))));
+//                return false;
+//            }
+//            if(!classId.equals(userInfoDO.getClassId())){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与班级不匹配，填写班级【{1}】 实际班级可能为【{2}】,可在另一文件中查看\n",String.valueOf(j),classId,userInfoDO.getClassId())));
+//                return false;
+//            }
+//        }else {
+//            List<UserInfoDO> userInfoDOs = userInfoDORepo.findAllByRealNameAndClassId(name, classId);
+//            if(userInfoDOs.size()>1){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 姓名与班级有多行匹配，可在另一文件中查看\n",String.valueOf(j))));
+//                return false;
+//            }else if(userInfoDOs.size()==0){
+//                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 姓名与班级不匹配，查无此记录，可在另一文件中查看\n",String.valueOf(j))));
+//                return false;
+//            }
+//            userInfoDO=userInfoDOs.get(0);
+//        }
+        if(sid.equals("")){
+            info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号未填入，可在另一文件中查看\n",String.valueOf(j))));
             return false;
-        }else if(classId.equals("")){
-            info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 未填写班级,无法比较,可在另一文件中查看\n",String.valueOf(j))));
-            return false;
-        }else if(!name.equals("")&&!sid.equals("")){
-            userInfoDO = userInfoDORepo.findByStuId(sid);
-            if(userInfoDO==null){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与姓名不匹配，查无此记录,可在另一文件中查看\n",String.valueOf(j))));
-                return false;
-            }
-            if(!name.equals(userInfoDO.getRealName())){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与姓名不匹配，填写姓名【{1}】 实际姓名可能为【{2}】,可在另一文件中查看\n",String.valueOf(j),name,userInfoDO.getRealName())));
-                return false;
-            }
-        }else if(!sid.equals("")){
-            userInfoDO = userInfoDORepo.findByStuId(sid);
-            if(userInfoDO==null){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号不存在，查无此记录,可在另一文件中查看\n",String.valueOf(j))));
-                return false;
-            }
-            if(!classId.equals(userInfoDO.getClassId())){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号与班级不匹配，填写班级【{1}】 实际班级可能为【{2}】,可在另一文件中查看\n",String.valueOf(j),classId,userInfoDO.getClassId())));
-                return false;
-            }
         }else {
-            List<UserInfoDO> userInfoDOs = userInfoDORepo.findAllByRealNameAndClassId(name, classId);
-            if(userInfoDOs.size()>1){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 姓名与班级有多行匹配，可在另一文件中查看\n",String.valueOf(j))));
-                return false;
-            }else if(userInfoDOs.size()==0){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 姓名与班级不匹配，查无此记录，可在另一文件中查看\n",String.valueOf(j))));
+            userInfoDO=userInfoDORepo.findByStuId(sid);
+            if(userInfoDO==null){
+                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号不存在，查无此学号，可在另一文件中查看\n",String.valueOf(j))));
                 return false;
             }
-            userInfoDO=userInfoDOs.get(0);
         }
         youthLearningBO.setUserId(userInfoDO.getUserId());
         return true;

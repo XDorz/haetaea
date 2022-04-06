@@ -308,7 +308,9 @@ public class UserServiceImpl implements UserService {
                 chapterList.add(importTable);
                 //放入活动章模块
                 UserRoutingTable chapter=new UserRoutingTable("/chapter","活动章模块",null,true,chapterList);
+                UserRoutingTable youth=new UserRoutingTable("/youthLearn","青年大学习导入","importYouthLearn",false,null);
                 if(!isManager){
+                    chapterList.add(youth);
                     userRoutingTable.add(chapter);
                 }
             }
@@ -338,6 +340,8 @@ public class UserServiceImpl implements UserService {
             List<UserRoutingTable> chapterList=new ArrayList<>();
             UserRoutingTable manage=new UserRoutingTable("/manage","导入/导出章","manageChapter",false,null);
             chapterList.add(manage);
+            UserRoutingTable youth=new UserRoutingTable("/youthLearn","青年大学习导入","importYouthLearn",false,null);
+            chapterList.add(youth);
             //放入活动章模块
             UserRoutingTable chapter=new UserRoutingTable("/chapter","活动章模块",null,true,chapterList);
             userRoutingTable.add(chapter);
