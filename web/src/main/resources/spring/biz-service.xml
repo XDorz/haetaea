@@ -39,6 +39,10 @@
     <bean id="practiceActivityStampService"
           class="us.betahouse.haetae.serviceimpl.activity.manager.stamp.PracticeActivityStampService"/>
 
+    <!--青年大学习章服务-->
+    <bean id="youthLearnStampService"
+          class="us.betahouse.haetae.serviceimpl.activity.manager.stamp.YouthLearnActivityStampService"/>
+
     <!--志愿服务章服务-->
     <bean id="volunteerActivityStampService"
           class="us.betahouse.haetae.serviceimpl.activity.manager.stamp.VolunteerActivityStampService"/>
@@ -62,6 +66,7 @@
                 <entry key="volunteerWork" value-ref="volunteerWorkStampService"/>
                 <entry key="partyActivity" value-ref="partyActivityStampService"/>
                 <entry key="partyTimeActivity" value-ref="partyTimeActivityStampService"/>
+                <entry key="youthLearningActivity" value-ref="youthLearnStampService"/>
             </map>
         </property>
     </bean>
