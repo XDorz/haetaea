@@ -45,6 +45,11 @@ public class YouthLearningBO {
     private Date finishTime;
 
     /**
+     * 完成时间，字符串型
+     */
+    private String time;
+
+    /**
      * 学号
      */
     private String stuId;
@@ -171,5 +176,13 @@ public class YouthLearningBO {
 
     public void setOrganization(String organization) {
         this.organization = organization;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

@@ -63,4 +63,12 @@ public interface YouthLearningRepoService {
      * @return
      */
     PageList<YouthLearningBO> getByActivityNameAndRealNameAndClassId(Pageable pageable, String activityId, String userId,List<String> userIds);
+
+    /**
+     * 判断是否存在记录
+     *
+     *
+     * @return
+     */
+    boolean exitByActivityNameAndUserId(String activityId,String userId);
 }

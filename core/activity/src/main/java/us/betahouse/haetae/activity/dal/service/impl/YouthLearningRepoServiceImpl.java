@@ -15,7 +15,9 @@ import us.betahouse.haetae.activity.idfactory.BizIdFactory;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.util.utils.CollectionUtils;
+import us.betahouse.util.utils.DateUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,8 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     @Autowired
     private YouthLearningDORepo youthLearningDORepo;
 
+    private SimpleDateFormat sdf=new SimpleDateFormat("");
+
     private YouthLearningBO convert(YouthLearningDO youthLearningDO){
         YouthLearningBO youthLearningBO=new YouthLearningBO();
         youthLearningBO.setActivityId(youthLearningDO.getActivityId());
@@ -47,6 +51,7 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
         youthLearningBO.setType(youthLearningDO.getType());
         youthLearningBO.setUserId(youthLearningDO.getUserId());
         youthLearningBO.setStatus(youthLearningDO.getStatus());
+        youthLearningBO.setTime(DateUtil.getOutputDateStr(youthLearningDO.getFinishTime()));
         return youthLearningBO;
     }
 
@@ -135,5 +140,10 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     public PageList<YouthLearningBO> getByActivityNameAndRealNameAndClassId(Pageable pageable,String activityId, String userId,List<String> userIds) {
         Page<YouthLearningDO> page = youthLearningDORepo.findAllByActivityIdContainsAndUserIdContainsAndClassIdIn(pageable, activityId, userId,userIds);
         return new PageList<YouthLearningBO>(this::convert,page);
+    }
+
+    @Override
+    public boolean exitByActivityNameAndUserId(String activityId,String userId) {
+        return youthLearningDORepo.existsByActivityIdAndUserId(activityId,userId);
     }
 }

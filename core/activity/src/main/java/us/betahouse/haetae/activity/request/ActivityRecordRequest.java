@@ -4,6 +4,8 @@
  */
 package us.betahouse.haetae.activity.request;
 
+import java.util.Date;
+
 /**
  * 活动记录管理请求
  *
@@ -55,6 +57,8 @@ public class ActivityRecordRequest extends BaseRequest {
      * 等第
      */
     private String grades;
+
+    private Date finishTime;
 
     public String getActivityRecordId() {
         return activityRecordId;
@@ -126,5 +130,13 @@ public class ActivityRecordRequest extends BaseRequest {
 
     public void setGrades(String grades) {
         this.grades = grades;
+    }
+
+    public Date getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
     }
 }

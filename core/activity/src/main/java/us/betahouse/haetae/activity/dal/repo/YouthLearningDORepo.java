@@ -56,6 +56,15 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
     List<YouthLearningDO> findAllByActivityIdAndUserIdAndStatus(String activityId,String userId,String status);
 
     /**
+     * 查询是否存在记录
+     *
+     * @param activityId
+     * @param userId
+     * @return
+     */
+    boolean existsByActivityIdAndUserId(String activityId,String userId);
+
+    /**
      * 根据学生id查找该生做了多少期
      *
      * @param userId

@@ -59,7 +59,7 @@ public class UserManagerTest {
 
     @Test
     public void batchBindRole() {
-            String stuId="20179061";
+            String stuId="209050729";
 //        String url = "C:\\Users\\j10k\\Desktop\\苏.csv";
 //        String[][] csv = CsvUtil.getWithHeader(url);
 //        for (int i = 1; i < csv.length; i++) {
@@ -98,8 +98,8 @@ public class UserManagerTest {
 
     @Test
     public void batchUnbindRole() {
-        List<String> userIds = Arrays.asList("201811302141428469790001201838");
-        List<String> roleIds= Arrays.asList("201904120142474335061300020412");
+        List<String> userIds = Arrays.asList("202010081759412065830001202026");
+        List<String> roleIds= Arrays.asList("201811302151309605429200021130");
 
         for (String userId : userIds) {
             UserManageRequest request = new UserManageRequest();
@@ -112,7 +112,7 @@ public class UserManagerTest {
     @Test
     public void batchBindPerm() {
         UserManageRequest request=new UserManageRequest();
-        request.setUserId("201812032105255787370001201847");
+        request.setUserId("202010081759412065830001202026");
         List<String> list= new ArrayList<>();
         list.add("201905232203216530124400040523");
         request.setPermIds(list);
