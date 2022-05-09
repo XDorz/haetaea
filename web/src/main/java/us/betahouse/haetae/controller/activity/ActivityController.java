@@ -122,7 +122,7 @@ public class ActivityController {
      * @param httpServletRequest
      * @return
      */
-//    @CheckLogin
+    @CheckLogin
     @PostMapping
     //添加活动时设置modified默认为false
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -365,7 +365,7 @@ public class ActivityController {
         });
     }
     /**
-     * 获取以往活动记录
+     * 获取以往活动
      *
      * @param request
      * @param httpServletRequest
@@ -1212,7 +1212,7 @@ public class ActivityController {
     }
 
     @CheckLogin
-    @DeleteMapping(value = "/youthlearning/delete")
+    @PostMapping(value = "/youthlearning/delete")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<Void> deleteYouthLearning(YouthLearnRequest request,HttpServletRequest httpServletRequest,MultipartFile file,HttpServletResponse response){
         return OperateTemplate.operate(LOGGER, "盖章员删除某人的学习记录", request, new OperateCallBack<Void>() {

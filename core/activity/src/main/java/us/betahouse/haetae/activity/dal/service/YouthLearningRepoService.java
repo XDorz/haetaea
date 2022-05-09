@@ -2,6 +2,7 @@ package us.betahouse.haetae.activity.dal.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 
@@ -31,6 +32,15 @@ public interface YouthLearningRepoService {
      * @return
      */
     List<YouthLearningBO> getRecordByUserId(String userId);
+
+    /**
+     * 通过学生id与学期得到记录
+     *
+     * @param userId
+     * @param term
+     * @return
+     */
+    List<YouthLearningBO> getRecordByUserIdAndTerm(String userId,String term);
 
     /**
      * 通过学生id得到记录数量
@@ -71,4 +81,12 @@ public interface YouthLearningRepoService {
      * @return
      */
     boolean exitByActivityNameAndUserId(String activityId,String userId);
+
+    /**
+     * 转换为ActivityRecordBO
+     *
+     * @param youthLearningBO
+     * @return
+     */
+    ActivityRecordBO convertARB(YouthLearningBO youthLearningBO);
 }

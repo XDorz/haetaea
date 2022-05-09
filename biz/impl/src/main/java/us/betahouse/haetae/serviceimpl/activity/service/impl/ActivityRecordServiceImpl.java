@@ -19,6 +19,7 @@ import us.betahouse.haetae.activity.dal.model.ActivityRecordDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.ActivityRecordDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
+import us.betahouse.haetae.activity.dal.service.YouthLearningRepoService;
 import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
@@ -95,6 +96,9 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
 
     @Autowired
     private BizIdFactory activityBizFactory;
+
+    @Autowired
+    private YouthLearningRepoService youthLearningRepoService;
 
     /**
      * 章管理器
@@ -187,8 +191,19 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         // 判断是否请求中带有学期过滤
         if (StringUtils.isBlank(request.getTerm())) {
             activityRecords.addAll(activityRecordManager.findByUserIdAndType(request.getUserId(), request.getType()));
+            List<ActivityRecordBO> collect = CollectionUtils.toStream(youthLearningRepoService.getRecordByUserId(request.getUserId()))
+                    .filter(Objects::nonNull)
+                    .map(youthLearningRepoService::convertARB)
+                    .collect(Collectors.toList());
+            activityRecords.addAll(collect);
         } else {
             activityRecords.addAll(activityRecordManager.fetchUserActivityRecord(request.getUserId(), request.getType(), request.getTerm()));
+            List<ActivityRecordBO> collect = CollectionUtils.toStream(
+                    youthLearningRepoService.getRecordByUserIdAndTerm(request.getUserId(),request.getTerm()))
+                    .filter(Objects::nonNull)
+                    .map(youthLearningRepoService::convertARB)
+                    .collect(Collectors.toList());
+            activityRecords.addAll(collect);
         }
         // set 去重
         Set<String> activityIds = CollectionUtils.toStream(activityRecords).filter(Objects::nonNull)
@@ -215,7 +230,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         for (ActivityRecordBO record : activityRecords) {
             if (StringUtils.isBlank(record.getScannerName())) {
                 String scannerName = userInfoRepoService.queryUserInfoByUserId(record.getScannerUserId()).getRealName();
-                activityRecordManager.updateScannerName(record.getActivityRecordId(), scannerName);
+//                activityRecordManager.updateScannerName(record.getActivityRecordId(), scannerName);
                 record.setScannerName(scannerName);
             }
             stampBuilder.withActivityBO(activityMap.get(record.getActivityId()))

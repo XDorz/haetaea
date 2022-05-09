@@ -12,6 +12,7 @@ import us.betahouse.haetae.activity.dal.service.YouthLearningRepoService;
 import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
+import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.util.utils.CollectionUtils;
@@ -107,6 +108,14 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     }
 
     @Override
+    public List<YouthLearningBO> getRecordByUserIdAndTerm(String userId, String term) {
+        return CollectionUtils.toStream(youthLearningDORepo.findAllByUserIdAndStatusAndTermOrderByFinishTimeDesc(userId,ActivityRecordStateEnum.ENABLE.getCode(),term))
+                .filter(Objects::nonNull)
+                .map(this::convert)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Integer getRecordNumByUserId(String userId) {
         return youthLearningDORepo.getNumByUserId(userId,ActivityRecordStateEnum.ENABLE.getCode());
     }
@@ -117,11 +126,21 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
      */
     @Override
     public List<YouthLearningBO> removeRepeat(List<YouthLearningBO> original){
+
+        List<String> userIds=new ArrayList<>();
+
         Iterator<YouthLearningBO> iterator = original.iterator();
         List<YouthLearningBO> list=new ArrayList<>();
         while (iterator.hasNext()){
             YouthLearningBO next = iterator.next();
             if(next.getActivityId()==null) next.setActivityId(activityDORepo.findAllByActivityNameAndStateNot(next.getActivityName(),ActivityStateEnum.CANCELED.getCode()).getActivityId());
+            if(userIds.contains(next.getUserId())){
+                list.add(next);
+                iterator.remove();
+                continue;
+            }else {
+                userIds.add(next.getUserId());
+            }
             if(youthLearningDORepo.findAllByActivityIdAndUserIdAndStatus(next.getActivityId(),next.getUserId(),ActivityRecordStateEnum.ENABLE.getCode()).size()!=0){
                 list.add(next);
                 iterator.remove();
@@ -145,5 +164,18 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     @Override
     public boolean exitByActivityNameAndUserId(String activityId,String userId) {
         return youthLearningDORepo.existsByActivityIdAndUserId(activityId,userId);
+    }
+
+    @Override
+    public ActivityRecordBO convertARB(YouthLearningBO youthLearningBO) {
+        ActivityRecordBO activityRecordBO=new ActivityRecordBO();
+        activityRecordBO.setActivityId(youthLearningBO.getActivityId());
+        activityRecordBO.setActivityRecordId(youthLearningBO.getActivityRecordId());
+        activityRecordBO.setScannerUserId(youthLearningBO.getScannerUserId());
+        activityRecordBO.setStatus(youthLearningBO.getStatus());
+        activityRecordBO.setTerm(youthLearningBO.getTerm());
+        activityRecordBO.setType(youthLearningBO.getType());
+        activityRecordBO.setCreateTime(youthLearningBO.getFinishTime());
+        return activityRecordBO;
     }
 }

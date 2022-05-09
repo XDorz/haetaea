@@ -22,6 +22,14 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
     List<YouthLearningDO> findAllByUserIdAndStatusOrderByFinishTimeDesc(String userId,String status);
 
     /**
+     * 根据学生id查找该生做了那几期
+     *
+     * @param userId
+     * @return
+     */
+    List<YouthLearningDO> findAllByUserIdAndStatusAndTermOrderByFinishTimeDesc(String userId,String status,String term);
+
+    /**
      * 根据活动查找有哪些学生做了+该期
      *
      * @param activityId

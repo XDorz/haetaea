@@ -110,6 +110,7 @@ public class Fileutil {
         public Result uploadWithoutPath(MultipartFile file) {
             return upload(file, "");
         }
+
     }
 
 }

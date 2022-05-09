@@ -33,7 +33,7 @@ final public class ActivityStampBuilder {
         activityStamp.setActivityId(activityRecordBO.getActivityId());
         activityStamp.setUserId(activityRecordBO.getUserId());
         activityStamp.setScannerUserId(activityRecordBO.getScannerUserId());
-        activityStamp.setTime(activityRecordBO.getTime());
+        if(activityRecordBO.getTime()!=null) activityStamp.setTime(activityRecordBO.getTime());
         activityStamp.setType(activityRecordBO.getType());
         activityStamp.setStatus(activityRecordBO.getStatus());
         activityStamp.setTerm(activityRecordBO.getTerm());

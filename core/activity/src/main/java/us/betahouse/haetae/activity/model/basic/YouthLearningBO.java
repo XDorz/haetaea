@@ -2,7 +2,7 @@ package us.betahouse.haetae.activity.model.basic;
 
 import java.util.Date;
 
-public class YouthLearningBO {
+public class YouthLearningBO{
 
     /**
      * 活动记录id

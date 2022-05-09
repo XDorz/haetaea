@@ -17,6 +17,8 @@ import us.betahouse.haetae.serviceimpl.activity.service.YouthLearningService;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyPerm;
 import us.betahouse.haetae.user.dal.model.UserInfoDO;
 import us.betahouse.haetae.user.dal.repo.UserInfoDORepo;
+import us.betahouse.util.enums.CommonResultCode;
+import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 
 import java.text.MessageFormat;
@@ -116,7 +118,10 @@ public class YouthLearningServiceImpl implements YouthLearningService {
 
     private Info remove(List<YouthLearningBO> list){
         ActivityDO activityDO = activityDORepo.findAllByActivityNameAndStateNot(list.get(0).getActivityName(), ActivityStateEnum.CANCELED.getCode());
-        list.forEach(youthLearningBO -> youthLearningBO.setActivityId(activityDO.getActivityId()));
+        AssertUtil.assertNotNull(activityDO, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
+        for (YouthLearningBO youthLearningBO : list) {
+            youthLearningBO.setActivityId(activityDO.getActivityId());
+        }
         Info info=new Info();
         int i=2;
         Iterator<YouthLearningBO> iterator = list.iterator();
