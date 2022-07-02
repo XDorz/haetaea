@@ -191,19 +191,19 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         // 判断是否请求中带有学期过滤
         if (StringUtils.isBlank(request.getTerm())) {
             activityRecords.addAll(activityRecordManager.findByUserIdAndType(request.getUserId(), request.getType()));
-            List<ActivityRecordBO> collect = CollectionUtils.toStream(youthLearningRepoService.getRecordByUserId(request.getUserId()))
-                    .filter(Objects::nonNull)
-                    .map(youthLearningRepoService::convertARB)
-                    .collect(Collectors.toList());
-            activityRecords.addAll(collect);
+//            List<ActivityRecordBO> collect = CollectionUtils.toStream(youthLearningRepoService.getRecordByUserId(request.getUserId()))
+//                    .filter(Objects::nonNull)
+//                    .map(youthLearningRepoService::convertARB)
+//                    .collect(Collectors.toList());
+//            activityRecords.addAll(collect);
         } else {
             activityRecords.addAll(activityRecordManager.fetchUserActivityRecord(request.getUserId(), request.getType(), request.getTerm()));
-            List<ActivityRecordBO> collect = CollectionUtils.toStream(
-                    youthLearningRepoService.getRecordByUserIdAndTerm(request.getUserId(),request.getTerm()))
-                    .filter(Objects::nonNull)
-                    .map(youthLearningRepoService::convertARB)
-                    .collect(Collectors.toList());
-            activityRecords.addAll(collect);
+//            List<ActivityRecordBO> collect = CollectionUtils.toStream(
+//                    youthLearningRepoService.getRecordByUserIdAndTerm(request.getUserId(),request.getTerm()))
+//                    .filter(Objects::nonNull)
+//                    .map(youthLearningRepoService::convertARB)
+//                    .collect(Collectors.toList());
+//            activityRecords.addAll(collect);
         }
         // set 去重
         Set<String> activityIds = CollectionUtils.toStream(activityRecords).filter(Objects::nonNull)
@@ -230,7 +230,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         for (ActivityRecordBO record : activityRecords) {
             if (StringUtils.isBlank(record.getScannerName())) {
                 String scannerName = userInfoRepoService.queryUserInfoByUserId(record.getScannerUserId()).getRealName();
-//                activityRecordManager.updateScannerName(record.getActivityRecordId(), scannerName);
+                activityRecordManager.updateScannerName(record.getActivityRecordId(), scannerName);
                 record.setScannerName(scannerName);
             }
             stampBuilder.withActivityBO(activityMap.get(record.getActivityId()))

@@ -376,9 +376,9 @@ public class UserServiceImpl implements UserService {
 //    @VerifyPerm(permType = {GeneralPermType.PERM_OPERATOR})
     @VerifyRole(roleCodes = {UserRoleCode.GENERAL_MANAGER})
     public void giveStamperPerm(CommonUserRequest request, OperateContext context) {
-        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMPER_MANAGE)),"该用户已有导章权限，不必给予");
-        PermBO permBO = permRepoService.queryPermByPermType(ActivityPermType.STAMPER_MANAGE);
-        AssertUtil.assertNotNull(permBO,CommonResultCode.SYSTEM_ERROR.getCode(),"查无导章权限");
+        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMP_IMPORTER)),"该用户已有导章权限，不必给予");
+        PermBO permBO = permRepoService.queryPermByPermType(ActivityPermType.STAMP_IMPORTER);
+        AssertUtil.assertNotNull(permBO,CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无导章权限存在，请联系管理员");
         UserManageRequest userManageRequest=new UserManageRequest();
         userManageRequest.setUserId(request.getOperateId());
         userManageRequest.setPermIds(Collections.singletonList(permBO.getPermId()));
@@ -395,9 +395,9 @@ public class UserServiceImpl implements UserService {
     @VerifyRole(roleCodes = {UserRoleCode.GENERAL_MANAGER})
     public void unBindStamperPerm(CommonUserRequest request, OperateContext context) {
         AssertUtil.assertTrue(!userBasicService.verifyPermissionByRoleCode(request.getOperateId(),Collections.singletonList(UserRoleCode.GENERAL_MANAGER)),"无法取消总管理导章权限");
-        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMPER_MANAGE)),"该用户没有导章权限,不必取消");
-        PermBO permBO = permRepoService.queryPermByPermType(ActivityPermTypeEnum.STAMPER_MANAGE.getCode());
-        AssertUtil.assertNotNull(permBO,CommonResultCode.SYSTEM_ERROR.getCode(),"查无导章权限");
+        AssertUtil.assertTrue(!permRepoService.verifyRolePermRelationByPermType(request.getOperateId(),Collections.singletonList(ActivityPermType.STAMP_IMPORTER)),"该用户没有导章权限,不必取消");
+        PermBO permBO = permRepoService.queryPermByPermType(ActivityPermTypeEnum.STAMP_IMPORTER.getCode());
+        AssertUtil.assertNotNull(permBO,CommonResultCode.SYSTEM_ERROR.getCode(),"查无导章权限存在，请联系管理员");
         permRepoService.userUnbindPerms(request.getOperateId(),Collections.singletonList(permBO.getPermId()));
     }
 

@@ -49,6 +49,9 @@ public enum ActivityTypeEnum {
      */
     PARTY_TIME_ACTIVITY("partyTimeActivity","党员时间活动"),
 
+    /**
+     * 青年大学习活动
+     */
     YOUTH_LEARNING_ACTIVITY("youthLearningActivity","青年大学习活动"),
     ;
 

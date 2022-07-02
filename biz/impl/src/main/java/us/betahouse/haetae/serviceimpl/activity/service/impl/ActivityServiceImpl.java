@@ -29,6 +29,7 @@ import us.betahouse.haetae.serviceimpl.activity.request.ActivityManagerRequest;
 import us.betahouse.haetae.serviceimpl.activity.service.ActivityService;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyPerm;
+import us.betahouse.haetae.serviceimpl.common.verify.VerifyRole;
 import us.betahouse.haetae.serviceimpl.user.enums.UserRoleCode;
 import us.betahouse.haetae.user.dal.service.PermRepoService;
 import us.betahouse.haetae.user.dal.service.RoleRepoService;
@@ -190,6 +191,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @VerifyPerm(permType = ActivityPermType.STAMPER_MANAGE)
+//    @VerifyRole(roleCodes = {UserRoleCode.ACTIVITY_MANAGER})
     @Transactional(rollbackFor = Exception.class)
     public void bindStamper(ActivityManagerRequest request, OperateContext context) {
         ActivityBO activity = activityRepoService.queryActivityByActivityId(request.getActivityId());
@@ -364,7 +366,7 @@ public class ActivityServiceImpl implements ActivityService {
             UserInfoBO userInfoBO = userInfoRepoService.queryUserInfoByUserId(activityBO.getCreatorId());
             if(userInfoBO!=null){
                 activityBO.setStuId(userInfoBO.getStuId());
-                activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMPER_MANAGE.getCode())));
+                activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMP_IMPORTER.getCode())));
             }
 
             list.add(activityBO);
@@ -379,7 +381,8 @@ public class ActivityServiceImpl implements ActivityService {
     public void updateActivityStampedTimeByActivityId(ActivityManagerRequest request, OperateContext context) {
         ActivityBO activityBO=activityRepoService.queryActivityByActivityId(request.getActivityId());
         if(!StringUtils.equals(request.getUserId(),activityBO.getCreatorId())){
-            if(!userBasicService.verifyPermissionByRoleCode(request.getUserId(),Collections.singletonList(UserRoleCode.GENERAL_MANAGER))){
+            if(!userBasicService.verifyPermissionByRoleCode(request.getUserId(),Collections.singletonList(UserRoleCode.ACTIVITY_MANAGER))){
+                if(!userBasicService.verifyPermissionByRoleCode(request.getUserId(),Collections.singletonList(UserRoleCode.GENERAL_MANAGER)))
                 throw new BetahouseException(CommonResultCode.FORBIDDEN,"您不是管理员或者活动创建人，无法修改扫章时间");
             }
         }
@@ -397,7 +400,7 @@ public class ActivityServiceImpl implements ActivityService {
             UserInfoBO userInfoBO = userInfoRepoService.queryUserInfoByUserId(activityBO.getCreatorId());
             if(userInfoBO!=null){
                 activityBO.setStuId(userInfoBO.getStuId());
-                activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMPER_MANAGE.getCode())));
+                activityBO.setCanStamp(userBasicService.verifyPermissionByPermType(activityBO.getCreatorId(),Collections.singletonList(ActivityPermTypeEnum.STAMP_IMPORTER.getCode())));
             }
             if(activityBO.getActivityStampedStart()==null&&activityBO.getActivityStampedEnd()==null){
                 if(activityBO.getStart()!=null&&activityBO.getEnd()!=null){

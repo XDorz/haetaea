@@ -28,6 +28,8 @@ public enum ActivityPermTypeEnum implements PermType {
 
     STAMPER_MANAGE(ActivityPermType.STAMPER_MANAGE, "盖章员管理", true),
 
+    STAMP_IMPORTER(ActivityPermType.STAMP_IMPORTER,"导章员",true),
+
     ACTIVITY_STAMPER(ActivityPermType.ACTIVITY_STAMPER, "活动盖章", false),
 
     //=====义工 权限相关=======

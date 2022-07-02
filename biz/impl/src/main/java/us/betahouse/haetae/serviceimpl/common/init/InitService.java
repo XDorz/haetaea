@@ -83,7 +83,7 @@ public class InitService {
         activityManagerPerm.add(ActivityPermType.ACTIVITY_PUBLISH);
         activityManagerPerm.add(ActivityPermType.ACTIVITY_FINISH);
         activityManagerPerm.add(ActivityPermType.ACTIVITY_RESTART);
-//        activityManagerPerm.add(ActivityPermType.STAMPER_MANAGE);
+        activityManagerPerm.add(ActivityPermType.STAMPER_MANAGE);
         //物资
         assetManagerPerm.add(AssetPermType.ASSET_CREATE);
         assetManagerPerm.add(AssetPermType.ASSET_UPDATE);

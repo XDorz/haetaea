@@ -44,6 +44,11 @@ public class ActivityPermType {
      */
     public final static String STAMPER_MANAGE = "STAMPER_MANAGE";
 
+    /**
+     * 导章员
+     */
+    public final static String STAMP_IMPORTER = "STAMP_IMPORTER";
+
 
     //=============义工活动==============
 

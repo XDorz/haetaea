@@ -182,17 +182,23 @@ public class ActivityBO extends ToString {
         if (activityTypeEnum == null) {
             return false;
         }
+        Date actStart= start;
+        Date actEnd=end;
+        if(activityStampedStart!=null&&activityStampedEnd!=null){
+            actStart=activityStampedStart;
+            actEnd=activityStampedEnd;
+        }
         switch (activityTypeEnum) {
             case VOLUNTEER_WORK:
                 return true;
             case PRACTICE_ACTIVITY:
                 return true;
             case VOLUNTEER_ACTIVITY:
-                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(start, end);
+                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(actStart,actEnd);
             case SCHOOL_ACTIVITY:
-                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(start, end);
+                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(actStart,actEnd);
             case LECTURE_ACTIVITY:
-                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(start, end);
+                return StringUtils.equals(state, ActivityStateEnum.PUBLISHED.getCode()) && DateUtil.nowIsBetween(actStart,actEnd);
             default:
                 return false;
         }

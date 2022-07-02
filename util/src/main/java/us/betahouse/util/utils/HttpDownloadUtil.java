@@ -101,20 +101,23 @@ public class HttpDownloadUtil {
                 while ((j=bufferedInputStream.read(bytes))!=-1){
                     zipOutputStream.write(bytes,0,j);
                 }
+                bufferedInputStream.close();
+                zipOutputStream.flush();
             }
-            response.reset();
-            response.setCharacterEncoding("UTF-8");
-            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-            response.addHeader("Content-Length", String.valueOf(volume));
-            response.setContentType("application/octet-stream");
         } catch (IOException e) {
             throw new BetahouseException("压缩文件写入错误！！！");
         }finally {
             try {
+                if(bufferedInputStream!=null) bufferedInputStream.close();
                 if(zipOutputStream!=null) zipOutputStream.flush();
                 if(zipOutputStream!=null) zipOutputStream.close();
+                if(bufferedOutputStream!=null) bufferedOutputStream.flush();
                 if(bufferedOutputStream!=null) bufferedOutputStream.close();
-                if(bufferedInputStream!=null) bufferedInputStream.close();
+                response.reset();
+                response.setCharacterEncoding("UTF-8");
+                response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+                response.addHeader("Content-Length", String.valueOf(volume));
+                response.setContentType("application/octet-stream");
             } catch (IOException e) {
                 throw new BetahouseException(RestResultCode.SYSTEM_ERROR,"压缩文件流关闭错误！！！");
             }

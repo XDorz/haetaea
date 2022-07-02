@@ -88,6 +88,7 @@ public class ActivityBlacklistRepoServiceImpl implements ActivityBlacklistRepoSe
 
     /**
      * 按活动id扫描缺席人员，加入黑名单
+     * 有更改，原为  if(activityEntryRecordBO.getAttend())
      *
      * @param activityId
      * @return
@@ -96,8 +97,10 @@ public class ActivityBlacklistRepoServiceImpl implements ActivityBlacklistRepoSe
     public List<ActivityBlacklistBO> addBlacklistByActivityId(String activityId) {
         List<ActivityBlacklistBO> activityBlacklistBOList = new ArrayList<>();
         for(ActivityEntryBO activityEntryBO:activityEntryRepoService.findAllByActivityId(activityId)){
-            for(ActivityEntryRecordBO activityEntryRecordBO:activityEntryRecordRepoService.findAllByActivityEntryId(activityEntryBO.getActivityEntryId())){
-                if(activityEntryRecordBO.getAttend()){
+            List<ActivityEntryRecordBO> activityEntrys = activityEntryRecordRepoService.findAllByActivityEntryId(activityEntryBO.getActivityEntryId());
+            if(activityEntrys==null||activityEntrys.size()==0) return new ArrayList<>();
+            for(ActivityEntryRecordBO activityEntryRecordBO:activityEntrys){
+                if(activityEntryRecordBO.getAttend()==null||!activityEntryRecordBO.getAttend()){
                     ActivityBlacklistBO activityBlacklistBO =  ActivityBlacklistBOBuilder.anActivityBlacklistBOBuilder()
                             .withActivityEntryId(activityEntryRecordBO.getActivityEntryId())
                             .withReason(ActivityBlacklistReasonEnum.ABSENCE.getCode())

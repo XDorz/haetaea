@@ -58,6 +58,7 @@ import us.betahouse.haetae.utils.RestResultUtil;
 import us.betahouse.util.common.Result;
 import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.enums.RestResultCode;
+import us.betahouse.util.exceptions.BetahouseException;
 import us.betahouse.util.log.Log;
 import us.betahouse.util.template.OperateCallBack;
 import us.betahouse.util.template.OperateTemplate;
@@ -969,6 +970,7 @@ public class ActivityController {
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
                 AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+                AssertUtil.assertNotNull(request.getActivityId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "活动id不能为空");
                 AssertUtil.assertStringNotBlank(request.getActivityName(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "活动名不能为空");
                 AssertUtil.assertStringNotBlank(request.getActivityType(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "活动类型不能为空");
                 AssertUtil.assertNotNull(request.getActivityStartTime(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "活动开始时间不能为空");
@@ -1098,6 +1100,7 @@ public class ActivityController {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(file,RestResultCode.ILLEGAL_PARAMETERS.getCode(),"请上传相应csv文件");
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
             }
 
             @Override
@@ -1122,7 +1125,7 @@ public class ActivityController {
                         }
                     }
                     if(stuId==-1||finishTime==-1||activityName==-1||stuClass==-1){
-                        HttpDownloadUtil.downloadByValue("result.txt","您上传的表格数据不完整,正确格式包含以下：学号/卡号/工号,单位/班级/社区（村）,完成时间,课程",response);
+                        HttpDownloadUtil.downloadByValue("result.txt","您上传的表格数据不完整,正确格式包含以下：学号/卡号/工号,单位/班级/社区（村）,学习时间,课程",response);
                         return RestResultUtil.buildFailResult();
                     }
                     List<YouthLearningBO> youthLearningBOS=new ArrayList<>();
@@ -1173,6 +1176,11 @@ public class ActivityController {
                     csvWriter.close();
                     ByteArrayInputStream infoStream=new ByteArrayInputStream(info.getInfo().toString().getBytes());
                     ByteArrayInputStream resultStream=new ByteArrayInputStream(outputStream.toByteArray());
+
+//                    FileOutputStream fileOutputStream=new FileOutputStream(System.getProperty("user.home")+"/desktop/123.csv");
+//                    fileOutputStream.write(outputStream.toByteArray());
+
+
                     HttpDownloadUtil.downloadInputStreamZIP("result.zip",response,"sheet.csv",resultStream,"info.txt",infoStream);
                     return RestResultUtil.buildFailResult();
                 } catch (IOException | ParseException e) {
@@ -1188,6 +1196,12 @@ public class ActivityController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<List<YouthLearningBO>> youthLearningByUserId(YouthLearnRequest request,HttpServletRequest httpServletRequest){
         return OperateTemplate.operate(LOGGER, "获取该用户参加的所有青年大学习活动", request, new OperateCallBack<List<YouthLearningBO>>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
             @Override
             public Result<List<YouthLearningBO>> execute() {
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
@@ -1202,6 +1216,12 @@ public class ActivityController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<Integer> youthLearningByUserIdNum(YouthLearnRequest request,HttpServletRequest httpServletRequest){
         return OperateTemplate.operate(LOGGER, "获取该用户参加的所有青年大学习活动的数量", request, new OperateCallBack<Integer>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
             @Override
             public Result<Integer> execute() {
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
@@ -1216,6 +1236,12 @@ public class ActivityController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<Void> deleteYouthLearning(YouthLearnRequest request,HttpServletRequest httpServletRequest,MultipartFile file,HttpServletResponse response){
         return OperateTemplate.operate(LOGGER, "盖章员删除某人的学习记录", request, new OperateCallBack<Void>() {
+
+            @Override
+            public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
             @Override
             public Result<Void> execute() throws IOException {
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
@@ -1281,9 +1307,9 @@ public class ActivityController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<String> addYouthLearnRecord(YouthLearnRequest request,HttpServletRequest httpServletRequest){
         return OperateTemplate.operate(LOGGER, "管理员单独添加记录", request, new OperateCallBack<String>() {
-
             @Override
             public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
                 AssertUtil.assertNotNull(request.getActivityName(),"请填入活动名称");
                 AssertUtil.assertNotNull(request.getStuId(),"请填入被加入学生学号");
                 AssertUtil.assertNotNull(request.getFinishTime(),"请填入完成时间");
@@ -1313,6 +1339,11 @@ public class ActivityController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<PageList<YouthLearningBO>> youthLearningSearch(YouthLearnRequest request,HttpServletRequest httpServletRequest){
         return OperateTemplate.operate(LOGGER, "盖章员查询某期大学习和某人学习情况", request, new OperateCallBack<PageList<YouthLearningBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
             @Override
             public Result<PageList<YouthLearningBO>> execute() {
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
