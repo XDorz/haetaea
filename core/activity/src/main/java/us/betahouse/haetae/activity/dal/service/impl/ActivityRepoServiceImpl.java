@@ -19,9 +19,8 @@ import us.betahouse.haetae.activity.dal.model.PastActivityDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.PastActivityDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
-import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
+import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
-import us.betahouse.haetae.activity.idfactory.BizIdFactoryImpl;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
@@ -31,7 +30,6 @@ import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 import us.betahouse.util.utils.LoggerUtil;
 
-import javax.annotation.Resource;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -349,20 +347,6 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         return new PageList<>(activityDORepo.findCanceledBy(pageable,stuId,activityName,organizationMessage,sTime,eTime), this::convert);
     }
 
-
-
-    @Override
-    public List<ActivityBO> findCreatedThisWeekNotPage(String activityName) {
-        List<ActivityBO> activityBOList = new ArrayList<>();
-        List<ActivityDO> createdThisWeekNotPage = (activityDORepo.findCreatedThisWeekNotPage(activityName));
-        for (ActivityDO activityDO : createdThisWeekNotPage) {
-            ActivityBO activityBO = convert(activityDO);
-            activityBOList.add(activityBO);
-        }
-        return activityBOList;
-    }
-
-
     @Override
     public PageList<ActivityBO> findCreatedThisWeek(Integer page, Integer limit,String activityName) {
         Pageable pageable = PageRequest.of(page, limit);
@@ -422,14 +406,6 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         Pageable pageable = PageRequest.of(page, limit);
         return new PageList<>(activityDORepo.findCanceledByUserId(pageable,userId), this::convert);
     }
-
-
-
-
-
-
-
-
 
     @Override
     public List<ActivityBO> convert(List<ActivityDO> activityDOs) {
@@ -550,4 +526,26 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         return pastActivityDO;
 
     }
+
+    @Override
+    public List<ActivityBO> findCreatedThisWeekNotPage(String activityName) {
+        List<ActivityBO> activityBOList = new ArrayList<>();
+        List<ActivityDO> createdThisWeekNotPage = (activityDORepo.findCreatedThisWeekNotPage(activityName));
+        for (ActivityDO activityDO : createdThisWeekNotPage) {
+            ActivityBO activityBO = convert(activityDO);
+            activityBOList.add(activityBO);
+        }
+        return activityBOList;
+    }
+
+    @Override
+    public Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage) {
+        return activityDORepo.queryActualNumPastMonthByOrganizationMessage(organizationMessage);
+    }
+
+    @Override
+    public Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage) {
+        return activityDORepo.querySignNumPastMonthByOrganizationMessage(organizationMessage);
+    }
+
 }

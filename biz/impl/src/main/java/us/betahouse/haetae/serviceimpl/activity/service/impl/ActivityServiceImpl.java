@@ -26,6 +26,7 @@ import us.betahouse.haetae.serviceimpl.activity.constant.*;
 import us.betahouse.haetae.serviceimpl.activity.enums.ActivityPermTypeEnum;
 import us.betahouse.haetae.serviceimpl.activity.manager.ActivityOperateManager;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityManagerRequest;
+import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
 import us.betahouse.haetae.serviceimpl.activity.service.ActivityService;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyPerm;
@@ -737,4 +738,17 @@ public class ActivityServiceImpl implements ActivityService {
         return activityManager.findCanceledByUserId(re);
     }
 
+    @Override
+    public Integer queryActualNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setOrganizationMessage(request.getOrganizationMessage());
+        return activityManager.queryActualNumPastMonthByOrganizationMessage(re);
+    }
+
+    @Override
+    public Integer querySignNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setOrganizationMessage(request.getOrganizationMessage());
+        return activityManager.querySignNumPastMonthByOrganizationMessage(re);
+    }
 }

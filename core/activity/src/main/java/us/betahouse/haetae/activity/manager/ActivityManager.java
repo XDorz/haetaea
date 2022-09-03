@@ -138,13 +138,6 @@ public interface ActivityManager {
     PageList<ActivityBO> findCanceledBy(ActivityRequest request) throws ParseException;
 
     /**
-     * 查找本周创建的活动 不分页
-     * @param request
-     * @return
-     */
-    List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request);
-
-    /**
      * 查找本周创建的活动 分页
      * @param request
      * @return
@@ -209,10 +202,24 @@ public interface ActivityManager {
      */
     PageList<ActivityBO> findCanceledByUserId(ActivityRequest request);
 
+    /**
+     * 查找本周创建的活动 不分页
+     * @param request
+     * @return
+     */
+    List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request);
 
+    /**
+     * 查根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param request
+     * @return
+     */
+    Integer queryActualNumPastMonthByOrganizationMessage(ActivityRequest request);
 
-
-
-
-
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param request
+     * @return
+     */
+    Integer querySignNumPastMonthByOrganizationMessage(ActivityRequest request);
 }

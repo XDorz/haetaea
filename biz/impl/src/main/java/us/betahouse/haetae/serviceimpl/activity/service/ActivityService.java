@@ -248,7 +248,19 @@ public interface ActivityService {
      */
     PageList<ActivityBO> findCanceledByUserId(ActivityManagerRequest request, OperateContext context);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer queryActualNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context);
 
-
-
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer querySignNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context);
 }

@@ -246,12 +246,6 @@ public class ActivityManagerImpl implements ActivityManager {
     }
 
     @Override
-    public List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request) {
-        List<ActivityBO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
-        return  createdThisWeekNotPage;
-    }
-
-    @Override
     public PageList<ActivityBO> findCreatedThisWeek(ActivityRequest request) {
         return  activityRepoService.findCreatedThisWeek(request.getPage(), request.getLimit(),request.getActivityName());
     }
@@ -330,4 +324,21 @@ public class ActivityManagerImpl implements ActivityManager {
         return activityRepoService.queryCanceledActivityByUserId(request.getUserId(),request.getPage(), request.getLimit());
     }
 
+    @Override
+    public List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request) {
+        List<ActivityBO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
+        return  createdThisWeekNotPage;
+    }
+
+    @Override
+    public Integer queryActualNumPastMonthByOrganizationMessage(ActivityRequest request) {
+        Integer queryActualNumPastMonthByOrganizationMessage = activityRepoService.queryActualNumPastMonthByOrganizationMessage(request.getOrganizationMessage());
+        return  queryActualNumPastMonthByOrganizationMessage;
+    }
+
+    @Override
+    public Integer querySignNumPastMonthByOrganizationMessage(ActivityRequest request) {
+        Integer querySignNumPastMonthByOrganizationMessage = activityRepoService.querySignNumPastMonthByOrganizationMessage(request.getOrganizationMessage());
+        return  querySignNumPastMonthByOrganizationMessage;
+    }
 }

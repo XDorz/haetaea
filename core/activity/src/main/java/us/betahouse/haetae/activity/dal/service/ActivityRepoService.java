@@ -231,15 +231,6 @@ public interface ActivityRepoService {
     PageList<ActivityBO> findCanceledBy(String stuId,String activityName,String organizationMessage
             ,Long start,Long end,Integer page,Integer limit) throws ParseException;
 
-
-
-    /**
-     * 查找本周创建的活动 不分页
-     * @param activityName
-     * @return
-     */
-    List<ActivityBO> findCreatedThisWeekNotPage(String activityName);
-
     /**
      * 查找本周创建的活动
      * @param page
@@ -299,11 +290,24 @@ public interface ActivityRepoService {
      */
     PageList<ActivityBO> queryCanceledActivityByUserId(String userId,Integer page,Integer limit);
 
+    /**
+     * 查找本周创建的活动 不分页
+     * @param activityName
+     * @return
+     */
+    List<ActivityBO> findCreatedThisWeekNotPage(String activityName);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param organizationMessage
+     * @return
+     */
+    Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage);
 
-
-
-
-
-
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param organizationMessage
+     * @return
+     */
+    Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
 }

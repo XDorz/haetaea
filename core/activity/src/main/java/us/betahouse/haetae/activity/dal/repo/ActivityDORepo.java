@@ -250,19 +250,6 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             "and activity_stamped_start >= ?4 and activity_stamped_end <= ?5 and user_id in( select user_id from common_user_info where stu_id like ?1 ) ",nativeQuery = true)
     Page<ActivityDO> findCanceledBy(Pageable pageable,String stuId, String activityName, String organizationMessage , Date start, Date end);
 
-
-
-    /**
-     * 本周创建的活动查询 不分页
-     * @param activityName
-     * @return
-     */
-    //
-    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
-            ,nativeQuery = true)
-    List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
-
-
     /**
      * 本周创建的活动分页查询
      * @param pageable
@@ -307,10 +294,32 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             ,nativeQuery = true)
     Page<ActivityDO> findCanceledByUserId(Pageable pageable, String userId);
 
+    /**
+     * 本周创建的活动查询 不分页
+     * @param activityName
+     * @return
+     */
+    //
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
+            ,nativeQuery = true)
+    List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param organizationMessage
+     * @return
+     */
+    @Query(value = "select count(*) from activity_record where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+            ,nativeQuery = true)
+    Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param organizationMessage
+     * @return
+     */
+    @Query(value = "select sum(number) from activity_entry where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+            ,nativeQuery = true)
 
-
-
-
+    Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
 }
