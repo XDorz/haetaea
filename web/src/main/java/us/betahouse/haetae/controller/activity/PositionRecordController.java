@@ -27,7 +27,8 @@ import us.betahouse.util.common.Result;
 import us.betahouse.util.enums.RestResultCode;
 import us.betahouse.util.log.Log;
 import us.betahouse.util.utils.AssertUtil;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -120,7 +121,7 @@ public class PositionRecordController {
     @Log(loggerName = LoggerName.WEB_DIGEST)
     @GetMapping(value = "/getActivityCredit")
     public Result<String> getActivityCredit(PositionRecordRestRequest request, HttpServletRequest httpServletRequest) {
-        return RestOperateTemplate.operate(LOGGER, "获取学分统计", request, new RestOperateCallBack<List<String>>() {
+        return RestOperateTemplate.operate(LOGGER, "获取学分统计", request, new RestOperateCallBack<String>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
@@ -136,11 +137,12 @@ public class PositionRecordController {
                         .withUserId(request.getUserId())
                         .build();
                 List<ActivityCreditsStatisticsBO> creditsstatistics = activityRecordService.Creditsstatistics();
-                return RestResultUtil.buildSuccessResult(creditsstatistics.toString(), "获取学分统计成功");
+                return RestResultUtil.buildSuccessResult(JSON.toJSONString(creditsstatistics), "获取学分统计成功");
             }
         });
     }
-    @Scheduled(cron = "0 30 2 * * ?")
+    //每周三凌晨三点执行一次
+    @Scheduled(cron = "* * 3 * * 3 *")
     public void getActivityCreditToCache() {
         activityRecordService.CreditsstatisticsPutCache();
     }
