@@ -11,6 +11,7 @@ import us.betahouse.haetae.activity.dal.service.ActivityRecordRepoService;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.manager.ActivityRecordManager;
 import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
+import us.betahouse.haetae.activity.model.basic.ActivityCreditsStatisticsBO;
 import us.betahouse.haetae.activity.request.ActivityRecordRequest;
 import us.betahouse.util.utils.AssertUtil;
 
@@ -117,5 +118,17 @@ public class ActivityRecordManagerImpl implements ActivityRecordManager {
     @Override
     public List<ActivityRecordBO> queryByActivityId(String activityId) {
         return activityRecordRepoService.queryByActivityId(activityId);
+    }
+
+        /**
+             *
+             * @author lzm
+             * @date 2022/8/9
+               @param
+             * @return
+             */
+    public List<ActivityCreditsStatisticsBO> queryByActivityId() {
+
+        return null;
     }
 }

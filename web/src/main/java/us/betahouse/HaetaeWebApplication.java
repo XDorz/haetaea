@@ -3,6 +3,7 @@ package us.betahouse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 @ImportResource(locations = {"classpath:spring/user.xml", "classpath:spring/biz-service.xml"})
 @SpringBootApplication
 @EnableScheduling
+@EnableCaching
 public class HaetaeWebApplication {
 
     @Autowired
