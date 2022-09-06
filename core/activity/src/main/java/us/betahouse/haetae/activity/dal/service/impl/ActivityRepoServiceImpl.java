@@ -548,4 +548,19 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         return activityDORepo.querySignNumPastMonthByOrganizationMessage(organizationMessage);
     }
 
+    @Override
+    public Integer findLectureActivityNum(String term) {
+        return activityDORepo.findLectureActivityNum(term);
+    }
+
+    @Override
+    public Integer findSchoolActivityNum(String term) {
+        return activityDORepo.findSchoolActivityNum(term);
+    }
+
+    @Override
+    public Integer findAllActivityNum(String term) {
+        return activityDORepo.findAllActivityNum(term);
+    }
+
 }

@@ -341,4 +341,22 @@ public class ActivityManagerImpl implements ActivityManager {
         Integer querySignNumPastMonthByOrganizationMessage = activityRepoService.querySignNumPastMonthByOrganizationMessage(request.getOrganizationMessage());
         return  querySignNumPastMonthByOrganizationMessage;
     }
+
+    @Override
+    public Integer findLectureActivityNum(ActivityRequest request) {
+        Integer findLectureActivityNum = activityRepoService.findLectureActivityNum(request.getTerm());
+        return  findLectureActivityNum;
+    }
+
+    @Override
+    public Integer findSchoolActivityNum(ActivityRequest request) {
+        Integer findSchoolActivityNum = activityRepoService.findSchoolActivityNum(request.getTerm());
+        return  findSchoolActivityNum;
+    }
+
+    @Override
+    public Integer findAllActivityNum(ActivityRequest request) {
+        Integer findAllActivityNum = activityRepoService.findAllActivityNum(request.getTerm());
+        return  findAllActivityNum;
+    }
 }

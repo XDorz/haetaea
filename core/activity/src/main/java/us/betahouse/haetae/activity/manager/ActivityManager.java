@@ -222,4 +222,25 @@ public interface ActivityManager {
      * @return
      */
     Integer querySignNumPastMonthByOrganizationMessage(ActivityRequest request);
+
+    /**
+     * 查找本学期的讲座活动数量
+     * @param request
+     * @return
+     */
+    Integer findLectureActivityNum(ActivityRequest request);
+
+    /**
+     * 查找本学期的校园活动数量
+     * @param request
+     * @return
+     */
+    Integer findSchoolActivityNum(ActivityRequest request);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param request
+     * @return
+     */
+    Integer findAllActivityNum(ActivityRequest request);
 }

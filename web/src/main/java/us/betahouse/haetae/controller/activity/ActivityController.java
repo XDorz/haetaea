@@ -1392,4 +1392,35 @@ public class ActivityController {
             }
         });
     }
+
+    /**
+     * 查询当前学期校园活动数量和讲座活动数量和总活动数量
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/findSchoolAndLectureActivityNumAndAllNum")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<Integer>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Integer>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<List<Integer>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
+                List<Integer> integers = new ArrayList<>();
+                String term = TermUtil.getNowTerm();
+                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
+                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
+                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
+                return RestResultUtil.buildSuccessResult(integers, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
+            }
+        });
+    }
 }

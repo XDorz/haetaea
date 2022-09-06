@@ -263,4 +263,28 @@ public interface ActivityService {
      * @return
      */
     Integer querySignNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查找本学期的讲座活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findLectureActivityNum(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查找本学期的校园活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findSchoolActivityNum(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findAllActivityNum(ActivityManagerRequest request, OperateContext context);
 }

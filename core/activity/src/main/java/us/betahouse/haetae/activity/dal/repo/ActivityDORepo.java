@@ -299,7 +299,6 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param activityName
      * @return
      */
-    //
     @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
             ,nativeQuery = true)
     List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
@@ -322,4 +321,31 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             ,nativeQuery = true)
 
     Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
+
+    /**
+     * 查找本学期的讲座活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where type = 'lectureActivity' and state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findLectureActivityNum(String term);
+
+    /**
+     * 查找本学期的校园活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where type = 'schoolActivity' and state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findSchoolActivityNum(String term);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findAllActivityNum(String term);
 }

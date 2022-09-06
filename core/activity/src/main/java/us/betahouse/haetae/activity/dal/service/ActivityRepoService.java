@@ -310,4 +310,25 @@ public interface ActivityRepoService {
      * @return
      */
     Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
+
+    /**
+     * 查找本学期的讲座活动数量
+     * @param term
+     * @return
+     */
+    Integer findLectureActivityNum(String term);
+
+    /**
+     * 查找本学期的校园活动数量
+     * @param term
+     * @return
+     */
+    Integer findSchoolActivityNum(String term);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param term
+     * @return
+     */
+    Integer findAllActivityNum(String term);
 }

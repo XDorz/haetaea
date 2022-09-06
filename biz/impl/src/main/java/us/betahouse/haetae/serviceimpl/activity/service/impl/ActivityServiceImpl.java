@@ -751,4 +751,26 @@ public class ActivityServiceImpl implements ActivityService {
         re.setOrganizationMessage(request.getOrganizationMessage());
         return activityManager.querySignNumPastMonthByOrganizationMessage(re);
     }
+
+    @Override
+    public Integer findLectureActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findLectureActivityNum(re);
+    }
+
+    @Override
+    public Integer findSchoolActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findSchoolActivityNum(re);
+    }
+
+    @Override
+    public Integer findAllActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findAllActivityNum(re);
+    }
+
 }
