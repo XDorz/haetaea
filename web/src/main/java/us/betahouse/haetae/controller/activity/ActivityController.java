@@ -1416,6 +1416,7 @@ public class ActivityController {
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
                 List<Integer> integers = new ArrayList<>();
                 String term = TermUtil.getNowTerm();
+                builder.withTerm(term);
                 integers.add(activityService.findSchoolActivityNum(builder.build(), context));
                 integers.add(activityService.findSchoolActivityNum(builder.build(), context));
                 integers.add(activityService.findSchoolActivityNum(builder.build(), context));
