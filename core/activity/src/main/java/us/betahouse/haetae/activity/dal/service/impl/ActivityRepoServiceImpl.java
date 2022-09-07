@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.activity.dal.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
@@ -19,9 +20,9 @@ import us.betahouse.haetae.activity.dal.model.PastActivityDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.PastActivityDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
-import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.util.enums.CommonResultCode;
@@ -563,4 +564,18 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
         return activityDORepo.findAllActivityNum(term);
     }
 
+    @Override
+    public List<String> findActivityName() {
+        return activityDORepo.findActivityName();
+    }
+
+    @Override
+    public List<Date> findActivityTime() {
+        return activityDORepo.findActivityTime();
+    }
+
+    @Override
+    public List<String> findActivityLocation() {
+        return activityDORepo.findActivityLocation();
+    }
 }

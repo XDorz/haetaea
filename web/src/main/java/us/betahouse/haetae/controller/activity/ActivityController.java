@@ -20,6 +20,7 @@ import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.manager.ActivityManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 import us.betahouse.haetae.activity.model.basic.ActivitySignBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
@@ -1418,9 +1419,44 @@ public class ActivityController {
                 String term = TermUtil.getNowTerm();
                 builder.withTerm(term);
                 integers.add(activityService.findSchoolActivityNum(builder.build(), context));
-                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
-                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
+                integers.add(activityService.findLectureActivityNum(builder.build(), context));
+                integers.add(activityService.findAllActivityNum(builder.build(), context));
                 return RestResultUtil.buildSuccessResult(integers, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
+            }
+        });
+    }
+
+    /**
+     * 查询活动名称，活动时间和活动地点
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/findActivityTimeAndPosition")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<ActivityNowLocationBO>> findActivityTimeAndPosition(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询活动名称，活动时间和活动地点", request, new OperateCallBack<List<ActivityNowLocationBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<List<ActivityNowLocationBO>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
+                List<ActivityNowLocationBO> activityNowLocationBOS = new ArrayList<>();
+                int size = activityService.findActivityName(builder.build(), context).size();
+                for(int i = 0; i < size; i ++ ){
+                    ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
+                    activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
+                    activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
+                    activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    activityNowLocationBOS.add(activityNowLocationBO);
+                }
+                return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");
             }
         });
     }

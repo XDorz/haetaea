@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.activity.manager;
 
+import cn.hutool.core.date.DateTime;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
@@ -243,4 +244,25 @@ public interface ActivityManager {
      * @return
      */
     Integer findAllActivityNum(ActivityRequest request);
+
+    /**
+     * 查询活动名称
+     *
+     * @return
+     */
+    List<String> findActivityName(ActivityRequest request);
+
+    /**
+     * 查询活动时间
+     *
+     * @return
+     */
+    List<Date> findActivityTime(ActivityRequest request);
+
+    /**
+     * 查询活动地点
+     *
+     * @return
+     */
+    List<String> findActivityLocation(ActivityRequest request);
 }

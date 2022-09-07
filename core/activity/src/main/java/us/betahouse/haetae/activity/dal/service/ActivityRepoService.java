@@ -4,8 +4,11 @@
  */
 package us.betahouse.haetae.activity.dal.service;
 
+import cn.hutool.core.date.DateTime;
+import org.springframework.data.jpa.repository.Query;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 
@@ -331,4 +334,25 @@ public interface ActivityRepoService {
      * @return
      */
     Integer findAllActivityNum(String term);
+
+    /**
+     * 查询活动名称
+     *
+     * @return
+     */
+    List<String> findActivityName();
+
+    /**
+     * 查询活动时间
+     *
+     * @return
+     */
+    List<Date> findActivityTime();
+
+    /**
+     * 查询活动地点
+     *
+     * @return
+     */
+    List<String> findActivityLocation();
 }

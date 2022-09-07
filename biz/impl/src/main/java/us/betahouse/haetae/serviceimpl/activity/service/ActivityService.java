@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.service;
 
+import cn.hutool.core.date.DateTime;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
@@ -12,6 +13,7 @@ import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -287,4 +289,28 @@ public interface ActivityService {
      * @return
      */
     Integer findAllActivityNum(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动名称
+     * @param request
+     * @param context
+     * @return
+     */
+    List<String> findActivityName(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动时间
+     * @param request
+     * @param context
+     * @return
+     */
+    List<Date> findActivityTime(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动地点
+     * @param request
+     * @param context
+     * @return
+     */
+    List<String> findActivityLocation(ActivityManagerRequest request, OperateContext context);
 }

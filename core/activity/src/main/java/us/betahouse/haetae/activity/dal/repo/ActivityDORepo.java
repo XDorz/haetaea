@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.activity.dal.repo;
 
+import cn.hutool.core.date.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 
 import java.util.Date;
 import java.util.List;
@@ -348,4 +350,32 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select count(*) from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
             ,nativeQuery = true)
     Integer findAllActivityNum(String term);
+
+    /**
+     * 查询活动名称
+     *
+     * @return
+     */
+    @Query(value = "select activity_name from activity where now() < end"
+            ,nativeQuery = true)
+    List<String> findActivityName();
+
+    /**
+     * 查询活动时间
+     *
+     * @return
+     */
+    @Query(value = "select start from activity where now() < end"
+            ,nativeQuery = true)
+    List<Date> findActivityTime();
+
+    /**
+     * 查询活动地点
+     *
+     * @return
+     */
+    @Query(value = "select location from activity where now() < end"
+            ,nativeQuery = true)
+    List<String> findActivityLocation();
+
 }

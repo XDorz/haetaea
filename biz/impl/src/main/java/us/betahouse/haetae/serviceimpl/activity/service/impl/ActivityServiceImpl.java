@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -771,6 +772,24 @@ public class ActivityServiceImpl implements ActivityService {
         ActivityRequest re=new ActivityRequest();
         re.setTerm(request.getTerm());
         return activityManager.findAllActivityNum(re);
+    }
+
+    @Override
+    public List<String> findActivityName(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityName(re);
+    }
+
+    @Override
+    public List<Date> findActivityTime(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityTime(re);
+    }
+
+    @Override
+    public List<String> findActivityLocation(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityLocation(re);
     }
 
 }
