@@ -107,6 +107,7 @@ public class InitService {
         localeManagerPerm.add(LocalePermType.APPLY_FIRST_CHECK);
         //用户
         userManagerPerm.add(UserPermType.USER_PASSWORD_RESET);
+        userManagerPerm.add(UserPermType.USER_FEEDBACK_MANAGER);
         //总管理
         generalManagerPerm.add(GeneralPermType.PERM_OPERATOR);
 //        generalManagerPerm.add(ActivityPermType.ACTIVITY_CREATE);
@@ -114,6 +115,7 @@ public class InitService {
 //        generalManagerPerm.add(ActivityPermType.ACTIVITY_FINISH);
 //        generalManagerPerm.add(ActivityPermType.ACTIVITY_RESTART);
         generalManagerPerm.add(ActivityPermType.STAMPER_MANAGE);
+        generalManagerPerm.add(UserPermType.USER_FEEDBACK_MANAGER);
     }
 
 

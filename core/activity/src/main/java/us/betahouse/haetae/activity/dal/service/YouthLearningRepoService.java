@@ -34,6 +34,13 @@ public interface YouthLearningRepoService {
     List<YouthLearningBO> getRecordByUserId(String userId);
 
     /**
+     * 通过学生id得到记录
+     *
+     * @return
+     */
+    List<YouthLearningBO> getRecordByUserIdAndTermAsc(String userId,String term);
+
+    /**
      * 通过学生id与学期得到记录
      *
      * @param userId

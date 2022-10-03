@@ -166,25 +166,31 @@ public class ActivityEntryServiceImpl implements ActivityEntryService {
             {
                 status = ActivityEntryStatusType.APPROVED.getCode();
                 if (new Date().before(activityEntryBO.getStart())) {
+                    //一个小时内即将开始报名的活动为倒计时
                     if (0 < seconds && seconds < 3600) {
                         //倒计时
                         status = ActivityEntryStatusType.COUNTDOWN.getCode();
                     }
                 } else if (DateUtil.nowIsBetween(activityEntryBO.getStart(), activityEntryBO.getEnd())) {
                     //报名中
+                    //在开始至结束时间内为报名中
                     status = ActivityEntryStatusType.REGISTRATION.getCode();
                 }
 
                 if (new Date().after(activityEntryBO.getStart())) {
+                    //寻找查询的人已经报名结束的活动
                     ActivityEntryRecordBO activityEntryRecordBO = activityEntryRecordRepoService.findByActivityEntryIdAndUserId(activityEntryBO.getActivityEntryId(), userID);
                     if (activityEntryRecordBO != null) {
+                        //如果此人有报名的活动的话
                         //后一个半小时时间,90分钟
                         Date anHourAndAHalfAfter = new Date(System.currentTimeMillis()+90*1000*60);
                         if(anHourAndAHalfAfter.before(activityRepoService.queryActivityByActivityId(activityEntryBO.getActivityId()).getStart())){
                             //取消报名
+                            //查询人已报名的活动在活动开始一个半小时前可以取消报名
                             status = ActivityEntryStatusType.CANCEL_REGISTERED.getCode();
                         }else{
                             //已报名
+                            //活动开始前一个半小时以后显示已报名，无法取消
                             status = ActivityEntryStatusType.REGISTERED.getCode();
                         }
                     } else if (activityEntryBO.getNumber() <= activityEntryRecordRepoService.countByActivityEntryIdAndState(activityEntryBO.getActivityEntryId(),ActivityEntryRecordStateEnum.SIGN_UP.getCode())) {
@@ -272,10 +278,8 @@ public class ActivityEntryServiceImpl implements ActivityEntryService {
         List<ActivityEntry> activityEntryList = new ArrayList<>();
         List<ActivityEntryRecordBO> activityEntryRecordBOList = CollectionUtils.toStream(activityEntryRecordRepoService.findAllByUserId(userID))
                 .filter((ActivityEntryRecordBO a) -> ActivityEntryRecordStateEnum.SIGN_UP.getCode().equals(a.getState())).collect(Collectors.toList());
+
         for(ActivityEntryRecordBO activityEntryRecordBO :activityEntryRecordBOList){
-
-
-
             ActivityEntryBO activityEntryBO = activityEntryRepoService.findByActivityEntryId(activityEntryRecordBO.getActivityEntryId());
             ActivityBO activityBO = activityRepoService.queryActivityByActivityId(activityEntryBO.getActivityId());
             long seconds = (activityEntryBO.getStart().getTime() - System.currentTimeMillis())/1000;
@@ -324,7 +328,8 @@ public class ActivityEntryServiceImpl implements ActivityEntryService {
         final String activityType = type;
         final String activityTerm = term;
         List<ActivityEntry> newList = CollectionUtils.toStream(activityEntryList)
-                .filter((ActivityEntry a) -> a.typeAndStatusAndTermFilter(activityType, null, activityTerm)).sorted((o1, o2) -> {
+                .filter((ActivityEntry a) -> a.typeAndStatusAndTermFilter(activityType, null, activityTerm))
+                .sorted((o1, o2) -> {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
                     try {
                         Date o1Date = simpleDateFormat.parse(o1.getStart());
@@ -462,7 +467,7 @@ public class ActivityEntryServiceImpl implements ActivityEntryService {
         //后一个半小时时间,90分钟
         Date anHourAndAHalfAfter = new Date(System.currentTimeMillis()+90*1000*60);
         Date start = activityRepoService.queryActivityByActivityId(activityId).getStart();
-        AssertUtil.assertTrue(anHourAndAHalfAfter.before(activityRepoService.queryActivityByActivityId(activityId).getStart()),"距离活动开始不足1.5小时，不允许取消报名");
+        AssertUtil.assertTrue(anHourAndAHalfAfter.before(activityRepoService.queryActivityByActivityId(activityId).getStart()),"距离活动开始不足一个半小时，不允许取消报名");
         activityEntryRecordRepoService.deleteRecord(activityEntryRecordBO);
     }
 

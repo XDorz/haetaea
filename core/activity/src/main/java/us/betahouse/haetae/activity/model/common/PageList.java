@@ -268,7 +268,6 @@ public class PageList<E> {
     /**
      * 此后建议使用这个构造函数进行带转换的初始化
      *
-     * @author xxj
      * @param function
      * @param page
      * @param <T> page中内涵的原始数据类型

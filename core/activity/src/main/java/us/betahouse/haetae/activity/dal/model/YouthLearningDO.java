@@ -12,7 +12,8 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "younth_learning_record",
         indexes = {
-            @Index(name = "uk_activity_record_id", columnList = "activity_record_id", unique = true)
+            @Index(name = "uk_activity_record_id", columnList = "activity_record_id", unique = true),
+            @Index(name = "uk_term", columnList = "term", unique = false)
         })
 public class YouthLearningDO extends BaseDO {
 

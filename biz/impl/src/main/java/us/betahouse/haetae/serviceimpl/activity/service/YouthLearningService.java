@@ -1,6 +1,7 @@
 package us.betahouse.haetae.serviceimpl.activity.service;
 
 import org.springframework.data.domain.Page;
+import us.betahouse.haetae.activity.model.basic.YouthLearnBatchBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
@@ -31,6 +32,7 @@ public interface YouthLearningService {
      *
      * @return
      */
+    @Deprecated
     List<YouthLearningBO> getRecordByUserId(YouthLearningRequest request);
 
     /**
@@ -38,6 +40,7 @@ public interface YouthLearningService {
      *
      * @return
      */
+    @Deprecated
     Integer getRecordNumByUserId(YouthLearningRequest request);
 
     /**
@@ -49,4 +52,12 @@ public interface YouthLearningService {
      * @return
      */
     PageList<YouthLearningBO> getByActivityNameAndUserName(YouthLearningRequest request);
+
+    /**
+     * 按学期分类获得用户的青年大学习记录
+     *
+     * @param request
+     * @return
+     */
+    List<YouthLearnBatchBO> getTermedRecordByUserId(YouthLearningRequest request);
 }

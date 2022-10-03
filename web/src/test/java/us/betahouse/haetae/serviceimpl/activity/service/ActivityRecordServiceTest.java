@@ -1,5 +1,7 @@
 package us.betahouse.haetae.serviceimpl.activity.service;
 
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
 import com.csvreader.CsvWriter;
 import org.apache.commons.lang.StringUtils;
@@ -14,9 +16,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.dal.model.ActivityRecordDO;
 import us.betahouse.haetae.activity.dal.model.PastActivityDO;
+import us.betahouse.haetae.activity.dal.model.YouthLearningDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.ActivityRecordDORepo;
 import us.betahouse.haetae.activity.dal.repo.PastActivityDORepo;
+import us.betahouse.haetae.activity.dal.repo.YouthLearningDORepo;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
@@ -34,6 +38,8 @@ import us.betahouse.haetae.serviceimpl.activity.request.ActivityStampRequest;
 import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
 import us.betahouse.haetae.serviceimpl.activity.service.impl.YouthLearningServiceImpl;
 import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
+import us.betahouse.haetae.user.dal.model.UserInfoDO;
+import us.betahouse.haetae.user.dal.repo.UserInfoDORepo;
 import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.util.utils.CsvUtil;
@@ -48,6 +54,8 @@ import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,7 +81,12 @@ public class ActivityRecordServiceTest {
     private PastActivityDORepo pastActivityDORepo;
     @Autowired
     private QualificationsDORepo qualificationsDORepo;
-    
+    @Autowired
+    private YouthLearningDORepo youthLearningDORepo;
+    @Autowired
+    private UserInfoDORepo userInfoDORepo;
+
+
     @Test
     public void delete() {
         Map<String, String[]> realNameAndStuIdMap = getRealNameAndStuIdMapFromExcel("C:\\Users\\86181\\Desktop\\国防教育动员大会.xlsx");
@@ -828,7 +841,7 @@ public class ActivityRecordServiceTest {
     }
 
     @Test
-    private void YouthLearningRecord(){
+    public void YouthLearningRecord(){
 //        try {
 //            String[][] values = CsvUtil.getWithHeader(file.getInputStream());
 //            int stuClass=-1,stuId=-1,finishTime=-1,activityName=-1;
@@ -903,5 +916,37 @@ public class ActivityRecordServiceTest {
 //            e.printStackTrace();
 //        }
 //        return null;
+    }
+
+    @Test
+    public void test(){
+        ExcelReader reader = ExcelUtil.getReader(System.getProperty("user.home") + "/desktop/" + getTodayString() + "/2022年各分院辅导员通讯录0904.xlsx");
+        Pattern pattern=Pattern.compile("\\d+");
+        List<String> list=new ArrayList();
+        for (int i = 1; i < reader.getRowCount(); i++) {
+            String val =reader.readCellValue(2, i).toString();
+            Matcher matcher = pattern.matcher(val);
+            if(matcher.matches()){
+                list.add(reader.readCellValue(3,i).toString().replace("★","")+"-"+val);
+            }
+        }
+        System.out.println(list.size());
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    public void exportYounthLearn(){
+        String name="2022年第20期";
+        ActivityDO activityDO = activityDORepo.findByActivityName(name);
+        List<YouthLearningDO> youthLearningDOS = youthLearningDORepo.findAllByActivityId(activityDO.getActivityId());
+        cn.hutool.core.text.csv.CsvWriter writer = cn.hutool.core.text.csv.CsvUtil.getWriter(System.getProperty("user.home") + "/desktop/result.csv", StandardCharsets.UTF_8);
+        writer.write(new String[]{"姓名", "学号", "活动名称", "完成时间"});
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (YouthLearningDO youthLearningDO : youthLearningDOS) {
+            UserInfoDO userInfoDO = userInfoDORepo.findByUserId(youthLearningDO.getUserId());
+            writer.write(new String[]{userInfoDO.getRealName(),userInfoDO.getStuId(),name,sdf.format(youthLearningDO.getFinishTime())});
+        }
+        writer.flush();
+        writer.close();
     }
 }

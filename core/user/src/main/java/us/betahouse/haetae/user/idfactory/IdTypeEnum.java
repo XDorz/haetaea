@@ -50,7 +50,12 @@ public enum IdTypeEnum {
     /**
      * 专业信息id
      */
-    MAJOR_ID("0008","专业");
+    MAJOR_ID("0008","专业"),
+
+    /**
+     * 用户反馈id
+     */
+    FEEDBACK_ID("0009","反馈");
 
     /**
      * 业务id

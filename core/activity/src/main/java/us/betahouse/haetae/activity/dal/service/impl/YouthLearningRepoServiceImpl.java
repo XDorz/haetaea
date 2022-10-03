@@ -108,6 +108,14 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     }
 
     @Override
+    public List<YouthLearningBO> getRecordByUserIdAndTermAsc(String userId, String term) {
+        return CollectionUtils.toStream(youthLearningDORepo.findAllByUserIdAndStatusAndTermOrderByFinishTimeAsc(userId,ActivityRecordStateEnum.ENABLE.getCode(),term))
+                .filter(Objects::nonNull)
+                .map(this::convert)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<YouthLearningBO> getRecordByUserIdAndTerm(String userId, String term) {
         return CollectionUtils.toStream(youthLearningDORepo.findAllByUserIdAndStatusAndTermOrderByFinishTimeDesc(userId,ActivityRecordStateEnum.ENABLE.getCode(),term))
                 .filter(Objects::nonNull)
@@ -127,20 +135,20 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
     @Override
     public List<YouthLearningBO> removeRepeat(List<YouthLearningBO> original){
 
-        List<String> userIds=new ArrayList<>();
+//        List<String> userIds=new ArrayList<>();
 
         Iterator<YouthLearningBO> iterator = original.iterator();
         List<YouthLearningBO> list=new ArrayList<>();
         while (iterator.hasNext()){
             YouthLearningBO next = iterator.next();
             if(next.getActivityId()==null) next.setActivityId(activityDORepo.findAllByActivityNameAndStateNot(next.getActivityName(),ActivityStateEnum.CANCELED.getCode()).getActivityId());
-            if(userIds.contains(next.getUserId())){
-                list.add(next);
-                iterator.remove();
-                continue;
-            }else {
-                userIds.add(next.getUserId());
-            }
+//            if(userIds.contains(next.getUserId())){
+//                list.add(next);
+//                iterator.remove();
+//                continue;
+//            }else {
+//                userIds.add(next.getUserId());
+//            }
             if(youthLearningDORepo.findAllByActivityIdAndUserIdAndStatus(next.getActivityId(),next.getUserId(),ActivityRecordStateEnum.ENABLE.getCode()).size()!=0){
                 list.add(next);
                 iterator.remove();

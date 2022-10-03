@@ -10,6 +10,7 @@ import us.betahouse.haetae.activity.model.basic.ActivityBO;
 import us.betahouse.haetae.serviceimpl.activity.model.ActivityEntryPublish;
 import us.betahouse.haetae.serviceimpl.common.utils.SubscribeUtil;
 import us.betahouse.util.utils.CollectionUtils;
+import us.betahouse.util.wechat.WeChatAccessTokenUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,9 +27,9 @@ public class ActivityPublishTest {
     ActivityEntryService activityEntryService;
 
 
-    private String APP_ID = "wxabf0acc20f14bbba";
+    private String APP_ID = "wx64d266213824cd8e";
 
-    private String SECRET ="d85d7d457b94d5feb17ba31b6b8f24fd";
+    private String SECRET ="d199aa9d2300dc1226cf505930ca6d7b";
     /**
      * 每天早上七点 查询是否有活动需要发布
      *
@@ -53,7 +54,8 @@ public class ActivityPublishTest {
        publish.setActivityName("测试活动");
        publish.setLocation("测试地点");
        publish.setNote("备注提示");
-      // SubscribeUtil.publishActivityByOpenId("oe38G5ju57Z57WXsqBygQUQmw-CQ",APP_ID,SECRET,publish);
+       publish.setActivityTime("2020-08-29 15:00:00");
+       SubscribeUtil.publishActivityByOpenId(null,"osXoT5cdp1tEW5yxh5ebjuQOFHTY",publish);
    }
 
 //todo 通过accessToken TemplateId 以及自定义的Data(发布内容) 来申请进行发布订阅消息

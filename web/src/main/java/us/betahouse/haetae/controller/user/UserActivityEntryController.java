@@ -130,6 +130,7 @@ public class UserActivityEntryController {
                         .withNote(request.getRecordNote())
                         .withChoose(request.getRecordChoose())
                         .build();
+                //todo choose何用？
                 ActivityEntryRecordBO activityEntryRecordBO = activityEntryService.createActivityEntryRecord(activityEntryRecordRequest);
                 if(activityEntryRecordBO == null){
                     return RestResultUtil.buildSuccessResult(null, "人已满");
@@ -267,8 +268,8 @@ public class UserActivityEntryController {
     }
 
     /**
-     *
      * 获取报名记录
+     *
      * @param request
      * @param httpServletRequest
      * @return
@@ -298,7 +299,4 @@ public class UserActivityEntryController {
                }
            });
        }
-
-
-
 }

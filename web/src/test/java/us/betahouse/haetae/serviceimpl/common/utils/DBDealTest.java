@@ -54,6 +54,7 @@ public class DBDealTest {
     @Test
 //    @Transactional(rollbackFor = Exception.class)
     public void initDB(){
+        try{
         int i=0;
         List<UserDO> all = userDORepo.findAll();
         UUID uuid=UUID.randomUUID();
@@ -69,52 +70,56 @@ public class DBDealTest {
             i++;
             System.out.println("保存第"+i+"条");
         }
-//        List<UserInfoDO> userInfoDOList = userInfoDORepo.findAll();
-//        for (UserInfoDO userInfoDO : userInfoDOList) {
-//            userInfoDO.setRealName(userInfoDO.getRealName().substring(0,1)+Math.round(Math.random()*1000));
-//            userInfoDO.setExtInfo("{}");
-//            userInfoDORepo.save(userInfoDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
-//        List<CompetitionDO> competitionDOList = competitionDORepo.findAll();
-//        for (CompetitionDO competitionDO : competitionDOList) {
-//            competitionDO.setExtInfo("{}");
-//            competitionDO.setTeamName("{}");
-//            competitionDO.setPictureUrl("");
-//            competitionDORepo.save(competitionDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
-//        List<QualificationsDO> qualificationsDOList = qualificationsDORepo.findAll();
-//        for (QualificationsDO qualificationsDO : qualificationsDOList) {
-//            qualificationsDO.setExtInfo("{}");
-//            qualificationsDO.setPictureUrl("");
-//            qualificationsDORepo.save(qualificationsDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
-//        List<SkillDO> skillDOList = skillDORepo.findAll();
-//        for (SkillDO skillDO : skillDOList) {
-//            skillDO.setExtInfo("{}");
-//            skillDO.setPictureUrl("");
-//            skillDORepo.save(skillDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
-//        List<ActivityRecordDO> recordDOList = activityRecordDORepo.findAll();
-//        for (ActivityRecordDO activityRecordDO : recordDOList) {
-//            activityRecordDO.setExtInfo("{}");
-//            activityRecordDORepo.save(activityRecordDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
-//        List<ActivityDO> activityDOList = activityDORepo.findAll();
-//        for (ActivityDO activityDO : activityDOList) {
-//            activityDO.setPictureUrl("");
-//            activityDORepo.save(activityDO);
-//            i++;
-//            System.out.println("保存第"+i+"条");
-//        }
+        List<UserInfoDO> userInfoDOList = userInfoDORepo.findAll();
+        for (UserInfoDO userInfoDO : userInfoDOList) {
+            userInfoDO.setRealName(userInfoDO.getRealName().substring(0,1)+Math.round(Math.random()*1000));
+            userInfoDO.setExtInfo("{}");
+            userInfoDORepo.save(userInfoDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        List<CompetitionDO> competitionDOList = competitionDORepo.findAll();
+        for (CompetitionDO competitionDO : competitionDOList) {
+            competitionDO.setExtInfo("{}");
+            competitionDO.setTeamName("{}");
+            competitionDO.setPictureUrl("");
+            competitionDORepo.save(competitionDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        List<QualificationsDO> qualificationsDOList = qualificationsDORepo.findAll();
+        for (QualificationsDO qualificationsDO : qualificationsDOList) {
+            qualificationsDO.setExtInfo("{}");
+            qualificationsDO.setPictureUrl("");
+            qualificationsDORepo.save(qualificationsDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        List<SkillDO> skillDOList = skillDORepo.findAll();
+        for (SkillDO skillDO : skillDOList) {
+            skillDO.setExtInfo("{}");
+            skillDO.setPictureUrl("");
+            skillDORepo.save(skillDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        List<ActivityRecordDO> recordDOList = activityRecordDORepo.findAll();
+        for (ActivityRecordDO activityRecordDO : recordDOList) {
+            activityRecordDO.setExtInfo("{}");
+            activityRecordDORepo.save(activityRecordDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        List<ActivityDO> activityDOList = activityDORepo.findAll();
+        for (ActivityDO activityDO : activityDOList) {
+            activityDO.setPictureUrl("");
+            activityDORepo.save(activityDO);
+            i++;
+            System.out.println("保存第"+i+"条");
+        }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

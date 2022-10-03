@@ -21,6 +21,7 @@ import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.manager.ActivityManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.YouthLearnBatchBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.common.log.LoggerName;
@@ -376,7 +377,7 @@ public class ActivityController {
     @GetMapping("/past")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<PastActivityVO> getPastActivity(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
-        return RestOperateTemplate.operate(LOGGER, "操作活动", request, new RestOperateCallBack<PastActivityVO>() {
+        return RestOperateTemplate.operate(LOGGER, "获取以往活动", request, new RestOperateCallBack<PastActivityVO>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
@@ -1139,10 +1140,10 @@ public class ActivityController {
                         YouthLearningBO youthLearningBO=new YouthLearningBO();
                         youthLearningBO.setScannerUserId(request.getUserId());
                         youthLearningBO.setType(ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode());
-                        youthLearningBO.setTerm(TermUtil.getNowTerm());
                         youthLearningBO.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
                         youthLearningBO.setActivityName(values[i][activityName]);
                         youthLearningBO.setFinishTime(simpleDateFormat.parse(values[i][finishTime]));
+                        youthLearningBO.setTerm(TermUtil.getTerm(youthLearningBO.getFinishTime()));
                         youthLearningBO.setClassId(values[i][stuClass]);
                         youthLearningBO.setStuId(values[i][stuId]);
                         youthLearningBOS.add(youthLearningBO);
@@ -1191,6 +1192,8 @@ public class ActivityController {
         });
     }
 
+    //该功能以由其他接口替代
+    @Deprecated
     @CheckLogin
     @GetMapping(value = "/youthlearning/byuserid")
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -1211,6 +1214,8 @@ public class ActivityController {
         });
     }
 
+    //该功能以由其他接口替代
+    @Deprecated
     @CheckLogin
     @GetMapping(value = "/youthlearning/byuseridnum")
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -1321,10 +1326,10 @@ public class ActivityController {
                 youthLearningBO.setStuId(request.getStuId());
                 youthLearningBO.setActivityName(request.getActivityName());
                 youthLearningBO.setStatus(ActivityRecordStateEnum.ENABLE.getCode());
-                youthLearningBO.setTerm(TermUtil.getNowTerm());
                 youthLearningBO.setType(ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode());
                 youthLearningBO.setScannerUserId(request.getUserId());
                 youthLearningBO.setFinishTime(new Date(request.getFinishTime()));
+                youthLearningBO.setTerm(TermUtil.getTerm(youthLearningBO.getFinishTime()));
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
                 youthLearningRequest.setYouthLearningBO(youthLearningBO);
                 youthLearningRequest.setUserId(request.getUserId());
@@ -1354,6 +1359,26 @@ public class ActivityController {
                 youthLearningRequest.setSize(request.getSize());
                 youthLearningRequest.setClassId(request.getClassId());
                 return RestResultUtil.buildSuccessResult(youthLearningService.getByActivityNameAndUserName(youthLearningRequest));
+            }
+        });
+    }
+
+    //todo 对结果进行排序！！！regex！
+    @CheckLogin
+    @PostMapping(value = "/youthlearning/selflearn")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<YouthLearnBatchBO>> getSelfYouthLearnRecord(YouthLearnRequest request, HttpServletRequest httpServletRequest){
+        return OperateTemplate.operate(LOGGER, "个人获取大学习记录情况", request, new OperateCallBack<List<YouthLearnBatchBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
+            @Override
+            public Result<List<YouthLearnBatchBO>> execute() {
+                YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
+                youthLearningRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(youthLearningService.getTermedRecordByUserId(youthLearningRequest));
             }
         });
     }

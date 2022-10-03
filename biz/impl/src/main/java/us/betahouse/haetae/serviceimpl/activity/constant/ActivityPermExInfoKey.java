@@ -4,6 +4,8 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.constant;
 
+import us.betahouse.haetae.serviceimpl.activity.enums.ActivityStampStatusEnum;
+
 /**
  * 权限拓展字段
  *

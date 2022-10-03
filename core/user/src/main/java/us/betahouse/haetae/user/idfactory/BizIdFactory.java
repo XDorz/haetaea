@@ -75,4 +75,9 @@ public interface BizIdFactory {
      * @return
      */
     String getMajorId();
+
+    /**
+     * 生成用户反馈信息
+     */
+    String getFeedBackId();
 }

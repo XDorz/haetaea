@@ -9,6 +9,8 @@ import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.service.YouthLearningRepoService;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
+import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
+import us.betahouse.haetae.activity.model.basic.YouthLearnBatchBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityPermType;
@@ -23,9 +25,13 @@ import us.betahouse.util.utils.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,12 +80,14 @@ public class YouthLearningServiceImpl implements YouthLearningService {
         return fail;
     }
 
+    @Deprecated
     @Override
     public List<YouthLearningBO> getRecordByUserId(YouthLearningRequest request) {
         return youthLearningRepoService.getRecordByUserId(request.getUserId());
     }
 
     @Override
+    @Deprecated
     public Integer getRecordNumByUserId(YouthLearningRequest request) {
         return youthLearningRepoService.getRecordNumByUserId(request.getUserId());
     }
@@ -107,6 +115,42 @@ public class YouthLearningServiceImpl implements YouthLearningService {
         return pageList;
     }
 
+    @Override
+    public List<YouthLearnBatchBO> getTermedRecordByUserId(YouthLearningRequest request) {
+        Map<String,Set<String>> map=new HashMap<>();
+        List<ActivityDO> activityDOS = activityDORepo.findAllByTypeAndStateNot(
+                ActivityTypeEnum.YOUTH_LEARNING_ACTIVITY.getCode(),ActivityStateEnum.CANCELED.getCode());
+        Set<String> termSet=new HashSet<>();
+        for (ActivityDO activityDO : activityDOS) {
+            String term = activityDO.getTerm();
+            termSet.add(term);
+            if(map.containsKey(term)){
+                map.get(term).add(activityDO.getActivityName());
+            }else {
+                Set<String> set=new HashSet<>();
+                set.add(activityDO.getActivityName());
+                map.put(term,set);
+            }
+        }
+        List<YouthLearnBatchBO> list=new ArrayList<>();
+        for (String s : termSet) {
+            Set<String> activityNameSet=new HashSet<>();
+            List<YouthLearningBO> youthLearningBOS = youthLearningRepoService.getRecordByUserIdAndTermAsc(request.getUserId(), s);
+            for (YouthLearningBO youthLearningBO : youthLearningBOS) {
+                activityNameSet.add(youthLearningBO.getActivityName());
+            }
+            Set<String> set = map.get(s);
+            set.removeAll(activityNameSet);
+            YouthLearnBatchBO youthLearnBatchBO=new YouthLearnBatchBO();
+            youthLearnBatchBO.setUndo(set);
+            youthLearnBatchBO.setTerm(s);
+            youthLearnBatchBO.setActivityName(activityNameSet);
+            youthLearnBatchBO.setYouthLearn(youthLearningBOS);
+            list.add(youthLearnBatchBO);
+        }
+        return list;
+    }
+
     private YouthLearningBO fill(YouthLearningBO youthLearningBO){
         UserInfoDO userInfoDO = userInfoDORepo.findByUserId(youthLearningBO.getUserId());
         youthLearningBO.setRealName(userInfoDO.getRealName());
@@ -117,9 +161,9 @@ public class YouthLearningServiceImpl implements YouthLearningService {
 
 
     private Info remove(List<YouthLearningBO> list){
-        ActivityDO activityDO = activityDORepo.findAllByActivityNameAndStateNot(list.get(0).getActivityName(), ActivityStateEnum.CANCELED.getCode());
-        AssertUtil.assertNotNull(activityDO, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
         for (YouthLearningBO youthLearningBO : list) {
+            ActivityDO activityDO = activityDORepo.findAllByActivityNameAndStateNot(youthLearningBO.getActivityName(), ActivityStateEnum.CANCELED.getCode());
+            AssertUtil.assertNotNull(activityDO, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
             youthLearningBO.setActivityId(activityDO.getActivityId());
         }
         Info info=new Info();

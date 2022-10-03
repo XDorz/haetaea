@@ -64,6 +64,7 @@ public class ActivityEntryController {
     @Autowired
     private ActivityRepoService activityRepoService;
 
+    //todo 报名活动完成扫码，top排在前面
     @CheckLogin
     @GetMapping
     @Log(loggerName = LoggerName.WEB_DIGEST)
@@ -222,7 +223,7 @@ public class ActivityEntryController {
         writer.merge(9, title+"--报名信息");
         writer.write(UserInfoBOLists, true);
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        response.setHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(title,"UTF-8") +".xls");
+        response.setHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(title,"UTF-8") +".xlsx");
         ServletOutputStream out=response.getOutputStream();
 
         writer.flush(out, true);

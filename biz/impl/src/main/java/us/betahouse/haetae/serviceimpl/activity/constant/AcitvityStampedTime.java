@@ -1,5 +1,8 @@
 package us.betahouse.haetae.serviceimpl.activity.constant;
 
+import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
+import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
+
 public class AcitvityStampedTime {
     /**
      * 扫章开放起始时间

@@ -32,6 +32,14 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     List<ActivityDO> findAllByType(String type);
 
     /**
+     * 通过活动类型和活动状态查找活动
+     *
+     * @param type
+     * @return
+     */
+    List<ActivityDO> findAllByTypeAndStateNot(String type,String state);
+
+    /**
      * 通过活动id获取
      *
      * @param activityId
@@ -87,6 +95,15 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @return
      */
     ActivityDO findAllByActivityNameAndStateNot(String activityName,String state);
+
+    /**
+     * 查找某一学期的所有类型活动
+     *
+     * @param type
+     * @param term
+     * @return
+     */
+    List<ActivityDO> findAllByTypeAndTerm(String type,String term);
 
     /**
      * 通过学期、状态、类型分页查询 倒序
@@ -306,9 +323,6 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
     @Query(value = "select * from activity where user_id = ?1 and state in ('APPROVED','CANCELED')"
             ,nativeQuery = true)
     Page<ActivityDO> findCanceledByUserId(Pageable pageable, String userId);
-
-
-
 
 
 

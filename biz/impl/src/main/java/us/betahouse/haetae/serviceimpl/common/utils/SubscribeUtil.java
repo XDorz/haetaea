@@ -55,6 +55,10 @@ public class SubscribeUtil {
      */
     private static final ReentrantLock lock = new ReentrantLock();
 
+    public static String publishActivityByOpenId(String page,String openId, ActivityEntryPublish activityEntryPublish){
+        return publishActivityByOpenId(page,openId,AccessTokenManage.GetToken(),activityEntryPublish);
+    }
+
     public static String publishActivityByOpenId(String page,String openId  , String accessToken, ActivityEntryPublish activityEntryPublish){
 
         String url = MessageFormat.format(PUBLISH_URL,accessToken);
@@ -90,6 +94,7 @@ public class SubscribeUtil {
             String result = HttpUtils.doPostUseJson(url,jsonObject.toString());
 
             JSONObject resultJson = JSONObject.parseObject(result);
+            System.out.println(resultJson);
             String code = resultJson.getString(ERROR_CODE);
             //GC
             jsonObject=null;
@@ -113,6 +118,25 @@ public class SubscribeUtil {
                     lock.unlock();
                     //再次推送
                     return SubscribeUtil.publishActivityByOpenId(page,openId, accessToken, activityEntryPublish);
+                }
+
+            }else if(StringUtils.equals(code,"40001")){
+                //防止token被连续刷新多次
+                lock.lock();
+                //第一个知道令牌过期的调用 刷新令牌
+
+                if (StringUtils.equals(accessToken,AccessTokenManage.GetToken())) {
+                    accessToken = AccessTokenManage.refreshToken();
+                    lock.unlock();
+                    //刷新后再次推送
+                    return SubscribeUtil.publishActivityByOpenId(page,openId, accessToken, activityEntryPublish);
+                    //如果令牌已经被刷新就不再去刷新 直接重新用新令牌发布一次 (类CAS思想)
+                }else {
+                    //重新获取新的令牌
+                    accessToken = AccessTokenManage.GetToken();
+                    lock.unlock();
+                    //再次推送
+                    return SubscribeUtil.publishActivityByOpenId(page, openId, accessToken, activityEntryPublish);
                 }
 
             }else if (StringUtils.equals(code,"43101"))

@@ -5,20 +5,27 @@
 package us.betahouse.haetae.user.dal.convert;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import us.betahouse.haetae.user.dal.model.MajorDO;
+import us.betahouse.haetae.user.dal.model.UserFeedBackDO;
 import us.betahouse.haetae.user.dal.model.UserInfoDO;
 import us.betahouse.haetae.user.dal.model.perm.PermDO;
 import us.betahouse.haetae.user.dal.model.perm.RoleDO;
 import us.betahouse.haetae.user.dal.model.perm.UserDO;
 import us.betahouse.haetae.user.dal.model.perm.UserRoleRelationDO;
-import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
+import us.betahouse.haetae.user.dal.repo.UserFeedBackDORepo;
+import us.betahouse.haetae.user.dal.repo.UserInfoDORepo;
 import us.betahouse.haetae.user.model.basic.MajorBO;
+import us.betahouse.haetae.user.model.basic.UserFeedBackBO;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.haetae.user.model.basic.perm.PermBO;
 import us.betahouse.haetae.user.model.basic.perm.RoleBO;
 import us.betahouse.haetae.user.model.basic.perm.UserBO;
 import us.betahouse.haetae.user.model.basic.perm.UserRoleRelationBO;
+import us.betahouse.util.utils.AssertUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,10 +34,14 @@ import java.util.Map;
  * @author dango.yxm
  * @version : EntityConverter.java 2018/11/23 11:09 AM dango.yxm
  */
-final public class EntityConverter {
+@Component
+public class EntityConverter {
 
     @Autowired
-    UserInfoRepoService userInfoRepoService;
+    UserInfoDORepo userInfoDORepo;
+
+    @Autowired
+    UserFeedBackDORepo userFeedBackDORepo;
 
     /**
      * 权限DO2BO
@@ -260,5 +271,47 @@ final public class EntityConverter {
         majorBO.setMajorName(majorDO.getMajorName());
         majorBO.setExtInfo(JSON.parseObject(majorDO.getExtInfo(),Map.class));
         return majorBO;
+    }
+
+    public static UserFeedBackDO convert(UserFeedBackBO userFeedBackBO){
+        UserFeedBackDO feedBackDO=new UserFeedBackDO();
+        feedBackDO.setContext(userFeedBackBO.getContext());
+        feedBackDO.setFeedBackHead(userFeedBackBO.getFeedBackHead());
+        feedBackDO.setFeedBackId(userFeedBackBO.getFeedBackId());
+        feedBackDO.setFeedBackNext(userFeedBackBO.getFeedBackNext());
+        feedBackDO.setTitle(userFeedBackBO.getTitle());
+        feedBackDO.setUserId(userFeedBackBO.getUserInfo().getUserId());
+        feedBackDO.setExtInfo(userFeedBackBO.getExtInfo());
+        feedBackDO.setVersion(userFeedBackBO.getVersion());
+        return feedBackDO;
+    }
+
+    public UserFeedBackBO convert(UserFeedBackDO userFeedBackDO){
+        UserFeedBackBO feedBackBO=new UserFeedBackBO();
+        feedBackBO.setContext(userFeedBackDO.getContext());
+        feedBackBO.setFeedBackHead(userFeedBackDO.getFeedBackHead());
+        feedBackBO.setFeedBackId(userFeedBackDO.getFeedBackId());
+        feedBackBO.setFeedBackNext(userFeedBackDO.getFeedBackNext());
+        feedBackBO.setTitle(userFeedBackDO.getTitle());
+        feedBackBO.setUserInfo(userInfoDORepo.findByUserId(userFeedBackDO.getUserId()));
+        feedBackBO.setVersion(userFeedBackDO.getVersion());
+        feedBackBO.setExtInfo(userFeedBackDO.getExtInfo());
+        List<UserFeedBackDO> list=new ArrayList<>();
+        UserFeedBackDO added=null;
+        if(userFeedBackDO.getFeedBackHead()==null){
+            //该回馈为回馈头的情况
+            added=userFeedBackDO;
+        }else {
+            //不为回馈头
+            added=userFeedBackDORepo.findAllByFeedBackId(userFeedBackDO.getFeedBackHead());
+        }
+        list.add(added);
+        while (added.getFeedBackNext()!=null){
+            added=userFeedBackDORepo.findAllByFeedBackId(userFeedBackDO.getFeedBackNext());
+            AssertUtil.assertNotNull(added,"系统错误，查询不到回馈链！");
+            list.add(added);
+        }
+        feedBackBO.setFeedBackChain(list);
+        return feedBackBO;
     }
 }

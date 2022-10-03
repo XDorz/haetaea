@@ -76,6 +76,20 @@ public class PageList<E> {
                 .collect(Collectors.toList());
     }
 
+    private <T> void init(Page<T> page, Function<T,E> convert, Object ignore) {
+        this.totalElements = page.getTotalElements();
+        this.totalPages = page.getTotalPages();
+        this.size = page.getSize();
+        this.number = page.getNumber();
+        this.numberOfElements = page.getNumberOfElements();
+        this.first = page.isFirst();
+        this.end = page.isLast();
+        this.content = (List<E>) toStream(page.getContent())
+                .filter(Objects::nonNull)
+                .map(convert)
+                .collect(Collectors.toList());
+    }
+
     @SuppressWarnings("unchecked")
     private void init(Page<?> page) {
         this.totalElements = page.getTotalElements();
@@ -161,11 +175,21 @@ public class PageList<E> {
     /**
      * Page<V> ->PageList<T>
      *
-     * @param page    org.springframework.data.domain.page jpa分页类
+     * @param page    {@link org.springframework.data.domain.Page} jpa分页类
      * @param convert 类型转换函数
      */
+    @Deprecated
     public PageList(Page<?> page, Function convert) {
         this.init(page, convert);
+    }
+
+    /**
+     * 新版泛型优化构造器
+     * ignore随便填值，不用管，仅为区分
+     * 话说上面那个方法真的能用吗？同名转换方法不会产生干扰吗...
+     */
+    public <T> PageList(Page<T> page, Function<T,E> convert,Object ignore) {
+        this.init(page, convert,null);
     }
 
     /**

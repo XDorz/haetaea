@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.controller.user;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import us.betahouse.haetae.common.session.CheckLogin;
 import us.betahouse.haetae.common.template.RestOperateCallBack;
 import us.betahouse.haetae.common.template.RestOperateTemplate;
 import us.betahouse.haetae.converter.UserVOConverter;
+import us.betahouse.haetae.model.user.request.UserFeedBackRestRequest;
 import us.betahouse.haetae.model.user.request.UserRequest;
 import us.betahouse.haetae.model.user.vo.UserVO;
 import us.betahouse.haetae.organization.model.OrganizationMemberBO;
@@ -29,13 +31,16 @@ import us.betahouse.haetae.serviceimpl.organization.service.OrganizationService;
 import us.betahouse.haetae.serviceimpl.user.builder.CommonUserRequestBuilder;
 import us.betahouse.haetae.serviceimpl.user.request.CommonUserRequest;
 import us.betahouse.haetae.serviceimpl.user.request.UploadUserExcelRequest;
+import us.betahouse.haetae.serviceimpl.user.request.UserFeedBackRequest;
 import us.betahouse.haetae.serviceimpl.user.routingtable.UserRoutingTable;
-import us.betahouse.haetae.serviceimpl.user.service.RoleService;
+import us.betahouse.haetae.serviceimpl.user.service.UserFeedBackService;
 import us.betahouse.haetae.serviceimpl.user.service.UserService;
+import us.betahouse.haetae.user.dal.model.UserFeedBackDO;
 import us.betahouse.haetae.user.dal.service.PermRepoService;
 import us.betahouse.haetae.user.dal.service.RoleRepoService;
 import us.betahouse.haetae.user.dal.service.UserInfoRepoService;
 import us.betahouse.haetae.user.model.CommonUser;
+import us.betahouse.haetae.user.model.basic.UserFeedBackBO;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 import us.betahouse.haetae.user.model.basic.perm.PermBO;
 import us.betahouse.haetae.user.model.basic.perm.RoleBO;
@@ -91,6 +96,9 @@ public class UserController {
 
     @Autowired
     private UserInfoRepoService userInfoRepoService;
+
+    @Autowired
+    private UserFeedBackService userFeedBackService;
 
     /**
      * 登陆
@@ -708,28 +716,117 @@ public class UserController {
     }
 
     @CheckLogin
-    @GetMapping(value = "/unQualified/collegeUpgrade")
+    @GetMapping(value = "/myfeedback")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<PageList<UserInfoBO>> getUnQualified2(UserRequest request, HttpServletRequest httpServletRequest) {
-        return RestOperateTemplate.operate(LOGGER, "查询大四专升本未达毕业要求学生信息", request, new RestOperateCallBack<PageList<UserInfoBO>>() {
+    public Result<PageList<UserFeedBackBO>> getUserFeedBack(UserFeedBackRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "查询自己的反馈记录", request, new RestOperateCallBack<PageList<UserFeedBackBO>>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
             }
             @Override
-            public Result<PageList<UserInfoBO>> execute() {
-                Integer limit = request.getLimit();
-                Integer page = request.getPage();
-                if(limit==null){
-                    limit=5;
-                }
-                if (page==null){
-                    page=0;
-                }
-                return RestResultUtil.buildSuccessResult(userInfoRepoService.findUnQualifiedCollegeUpgrade(page,limit),"查询大四专升本未达毕业要求学生成功");
+            public Result<PageList<UserFeedBackBO>> execute() {
+                UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
+                feedBackRequest.setPageable(request.getPageable());
+                feedBackRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(userFeedBackService.getUserFeedBack(feedBackRequest),"用户查询反馈记录成功");
             }
         });
     }
+
+    @CheckLogin
+    @GetMapping(value = "/userfeedback")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<UserFeedBackBO>> getFeedBackByUserId(UserFeedBackRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "查询某一用户的反馈记录", request, new RestOperateCallBack<PageList<UserFeedBackBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
+                AssertUtil.assertNotNull(request.getTargetId(),RestResultCode.ILLEGAL_PARAMETERS.getCode(),"查询用户的id不能为空");
+            }
+            @Override
+            public Result<PageList<UserFeedBackBO>> execute() {
+                UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
+                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setUserId(request.getUserId());
+                feedBackRequest.setTargetId(request.getTargetId());
+                return RestResultUtil.buildSuccessResult(userFeedBackService.getFeedBackByUserId(feedBackRequest),"查询用户反馈记录成功");
+            }
+        });
+    }
+
+    @CheckLogin
+    @GetMapping(value = "/feedback")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<UserFeedBackBO>> getFeedBack(UserFeedBackRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "查询所有反馈记录", request, new RestOperateCallBack<PageList<UserFeedBackBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
+            }
+            @Override
+            public Result<PageList<UserFeedBackBO>> execute() {
+                UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
+                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(userFeedBackService.getAllFeedBack(feedBackRequest),"查询所有反馈记录成功");
+            }
+        });
+    }
+
+    @CheckLogin
+    @GetMapping(value = "/versionfeedback")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<PageList<UserFeedBackBO>> getVersionFeedBack(UserFeedBackRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "根据版本查询反馈记录", request, new RestOperateCallBack<PageList<UserFeedBackBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
+                AssertUtil.assertNotNull(request.getVersion(),RestResultCode.ILLEGAL_PARAMETERS.getCode(),"版本号不能为空");
+            }
+            @Override
+            public Result<PageList<UserFeedBackBO>> execute() {
+                UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
+                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setVersion(request.getVersion());
+                feedBackRequest.setUserId(request.getUserId());
+                return RestResultUtil.buildSuccessResult(userFeedBackService.getAllFeedBackByVersion(feedBackRequest),"用户查询反馈记录成功");
+            }
+        });
+    }
+
+    @CheckLogin
+    @PostMapping(value = "/feedback")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<Void> saveFeedBack(UserFeedBackRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "提交反馈记录", request, new RestOperateCallBack<Void>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
+            }
+            @Override
+            public Result<Void> execute() {
+                UserFeedBackDO userFeedBackDO=new UserFeedBackDO();
+                userFeedBackDO.setVersion(request.getVersion());
+                userFeedBackDO.setExtInfo(JSONObject.toJSONString(request.getExtInfo()));
+                userFeedBackDO.setFeedBackHead(request.getFeedBackHead());
+                userFeedBackDO.setFeedBackNext(request.getFeedBackNext());
+                userFeedBackDO.setUserId(request.getUserId());
+                userFeedBackDO.setTitle(request.getTitle());
+                userFeedBackDO.setContext(request.getContext());
+                UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
+                feedBackRequest.setUserFeedBackDO(userFeedBackDO);
+                userFeedBackService.save(feedBackRequest);
+                return RestResultUtil.buildSuccessResult(null,"保存反馈成功");
+            }
+        });
+    }
+
 
     //每天凌晨两点半刷新未合格标志
     @Scheduled(cron = "0 30 2 * * ?")

@@ -301,6 +301,9 @@ public class UserServiceImpl implements UserService {
             UserRoutingTable youthLearn=new UserRoutingTable("/youthquery","大学习记录查询","youthquery",false,null);
             activityListA.add(youthLearn);
 
+            UserRoutingTable youthRecord=new UserRoutingTable("/youthrecord","大学习记录修改","youthrecord",false,null);
+            activityListA.add(youthRecord);
+
             //放入活动模块
             UserRoutingTable activity=new UserRoutingTable("/activity","活动模块",null,true,activityListA);
             if(!isManager){
@@ -340,6 +343,9 @@ public class UserServiceImpl implements UserService {
             //放入活动模块
             UserRoutingTable activity=new UserRoutingTable("/activity","活动模块",null,true,activityList);
             userRoutingTable.add(activity);
+
+            UserRoutingTable youthRecord = new UserRoutingTable("/youthrecord","大学习记录修改","youthrecord",false,null);
+            userRoutingTable.add(youthRecord);
 
             List<UserRoutingTable> chapterList=new ArrayList<>();
             UserRoutingTable manage=new UserRoutingTable("/manage","导入/导出章","manageChapter",false,null);

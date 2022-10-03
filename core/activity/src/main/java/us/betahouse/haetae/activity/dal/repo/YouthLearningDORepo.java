@@ -22,6 +22,14 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
     List<YouthLearningDO> findAllByUserIdAndStatusOrderByFinishTimeDesc(String userId,String status);
 
     /**
+     * 根据活动id查找
+     *
+     * @param activityId
+     * @return
+     */
+    List<YouthLearningDO> findAllByActivityId(String activityId);
+
+    /**
      * 根据学生id查找该生做了那几期
      *
      * @param userId
@@ -30,7 +38,15 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
     List<YouthLearningDO> findAllByUserIdAndStatusAndTermOrderByFinishTimeDesc(String userId,String status,String term);
 
     /**
-     * 根据活动查找有哪些学生做了+该期
+     * 根据学生id查找该生做了那几期
+     *
+     * @param userId
+     * @return
+     */
+    List<YouthLearningDO> findAllByUserIdAndStatusAndTermOrderByFinishTimeAsc(String userId,String status,String term);
+
+    /**
+     * 根据活动查找有哪些学生做了该期
      *
      * @param activityId
      * @return
@@ -73,6 +89,14 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
     boolean existsByActivityIdAndUserId(String activityId,String userId);
 
     /**
+     * 按学期查询青年大学习活动
+     *
+     * @param term
+     * @return
+     */
+    boolean findAllByTermAndStatus(String term,String status);
+
+    /**
      * 根据学生id查找该生做了多少期
      *
      * @param userId
@@ -113,4 +137,7 @@ public interface YouthLearningDORepo extends JpaRepository<YouthLearningDO,Long>
      */
     @Query(value = "select * from younth_learning_record where activity_id like concat('%',?1,'%') and user_id like concat('%',?2,'%') and user_id in (?3)",nativeQuery = true)
     Page<YouthLearningDO> findAllByActivityIdContainsAndUserIdContainsAndClassIdIn(Pageable pageable,String activityId,String userId,List<String> userIds);
+
+    @Query(value = "select user_id from younth_learning_record group by user_id",nativeQuery = true)
+    List<String> getAllUserId();
 }

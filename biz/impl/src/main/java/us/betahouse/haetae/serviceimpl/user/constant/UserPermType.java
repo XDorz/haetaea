@@ -11,4 +11,6 @@ public class UserPermType {
      * 用户密码重置
      */
     public static final String USER_PASSWORD_RESET = "USER_PASSWORD_RESET";
+
+    public static final String USER_FEEDBACK_MANAGER="USER_FEEDBACK_MANAGER";
 }
