@@ -32,6 +32,7 @@ public class ActivityRecordManagerImpl implements ActivityRecordManager {
     @Autowired
     private ActivityRepoService activityRepoService;
 
+
     /**
      * 通过用户id查询活动记录
      *
@@ -120,15 +121,4 @@ public class ActivityRecordManagerImpl implements ActivityRecordManager {
         return activityRecordRepoService.queryByActivityId(activityId);
     }
 
-        /**
-             *
-             * @author lzm
-             * @date 2022/8/9
-               @param
-             * @return
-             */
-    public List<ActivityCreditsStatisticsBO> queryByActivityId() {
-
-        return null;
-    }
 }

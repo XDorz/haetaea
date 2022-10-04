@@ -30,10 +30,8 @@
         <module>biz/impl</module>
         <module>web</module>
     </modules>
-
     <dependencyManagement>
         <dependencies>
-
             <!-- 子模块 start -->
             <!--core 层-->
             <dependency>

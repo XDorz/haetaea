@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class QualificationsRepoServiceTest {
-
     @Autowired
     private QualificationsRepoService qualificationsRepoService;
 

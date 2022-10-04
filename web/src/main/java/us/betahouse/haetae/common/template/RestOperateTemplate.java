@@ -39,7 +39,6 @@ public class RestOperateTemplate {
 
             //执行操作
             result = callBack.execute();
-
             //操作后置
             callBack.after();
             return result;

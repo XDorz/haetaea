@@ -115,4 +115,7 @@ public interface ActivityRecordRepoService {
      */
     int queryActualStamperNumByActivityId(String activityId);
 
+
+
+
 }
