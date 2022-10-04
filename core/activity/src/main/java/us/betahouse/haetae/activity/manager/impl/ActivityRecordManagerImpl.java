@@ -11,6 +11,7 @@ import us.betahouse.haetae.activity.dal.service.ActivityRecordRepoService;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.manager.ActivityRecordManager;
 import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
+import us.betahouse.haetae.activity.model.basic.ActivityCreditsStatisticsBO;
 import us.betahouse.haetae.activity.request.ActivityRecordRequest;
 import us.betahouse.util.utils.AssertUtil;
 
@@ -30,6 +31,7 @@ public class ActivityRecordManagerImpl implements ActivityRecordManager {
 
     @Autowired
     private ActivityRepoService activityRepoService;
+
 
     /**
      * 通过用户id查询活动记录

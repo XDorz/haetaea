@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class QualificationsRepoServiceTest {
-
     @Autowired
     private QualificationsRepoService qualificationsRepoService;
 
@@ -147,7 +146,7 @@ public class QualificationsRepoServiceTest {
         for (Map<String, Object> map : readAll) {
 //            UserInfoBO userInfoBO = userInfoRepoService.queryUserInfoByStuId(String.valueOf(map.get("队长学号")));
 //            String userid = userInfoBO.getUserId();
-//
+
             List<Map<String, String>> teacherList = new ArrayList<>();
             List<String> workerList = new ArrayList<>();
             for (String teacher : String.valueOf(map.get("指导老师")).split(",")) {

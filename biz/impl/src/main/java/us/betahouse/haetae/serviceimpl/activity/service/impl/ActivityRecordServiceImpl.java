@@ -11,6 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,7 @@ import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.dal.model.ActivityRecordDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
 import us.betahouse.haetae.activity.dal.repo.ActivityRecordDORepo;
+import us.betahouse.haetae.activity.dal.service.ActivityRecordRepoService;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.dal.service.YouthLearningRepoService;
 import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
@@ -26,8 +29,13 @@ import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.idfactory.BizIdFactory;
 import us.betahouse.haetae.activity.manager.ActivityRecordManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityCreditsStatisticsBO;
 import us.betahouse.haetae.activity.model.basic.ActivityRecordBO;
 import us.betahouse.haetae.activity.model.basic.importModel;
+import us.betahouse.haetae.certificate.dal.service.CompetitionRepoService;
+import us.betahouse.haetae.certificate.dal.service.impl.CompetitionRepoServiceImpl;
+import us.betahouse.haetae.certificate.enums.CertificateTypeEnum;
+import us.betahouse.haetae.certificate.model.basic.CertificateBO;
 import us.betahouse.haetae.serviceimpl.activity.builder.ActivityStampBuilder;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityExtInfoKey;
 import us.betahouse.haetae.serviceimpl.activity.constant.ActivityPermExInfoKey;
@@ -82,6 +90,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     @Autowired
     private UserBasicService userBasicService;
 
+
     @Autowired
     private UserInfoRepoService userInfoRepoService;
 
@@ -100,6 +109,12 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     @Autowired
     private YouthLearningRepoService youthLearningRepoService;
 
+    @Autowired
+    private ActivityRecordRepoService activityRecordRepoService;
+
+    @Autowired
+    private CompetitionRepoService competitionRepoService;
+
     /**
      * 章管理器
      */
@@ -116,15 +131,15 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         List<String> notStampStuIds = new ArrayList<>();
 
         ActivityDO activityDO = activityDORepo.findByActivityId(request.getActivityId());
-        Date activityStampedStart=activityDO.getActivityStampedStart();
-        Date activityStampedEnd=activityDO.getActivityStampedEnd();
-        if(activityStampedStart==null||activityStampedEnd==null){
-            activityDORepo.updateActivityStampedTimeByActivityId(activityDO.getStart(),activityDO.getEnd(),activityDO.getActivityId());
-            if(!DateUtil.nowIsBetween(activityDO.getStart(),activityDO.getEnd())){
-                throw new BetahouseException(CommonResultCode.SYSTEM_ERROR,"当前时间不在活动时间段内");
+        Date activityStampedStart = activityDO.getActivityStampedStart();
+        Date activityStampedEnd = activityDO.getActivityStampedEnd();
+        if (activityStampedStart == null || activityStampedEnd == null) {
+            activityDORepo.updateActivityStampedTimeByActivityId(activityDO.getStart(), activityDO.getEnd(), activityDO.getActivityId());
+            if (!DateUtil.nowIsBetween(activityDO.getStart(), activityDO.getEnd())) {
+                throw new BetahouseException(CommonResultCode.SYSTEM_ERROR, "当前时间不在活动时间段内");
             }
-        }else if(!DateUtil.nowIsBetween(activityStampedStart,activityStampedEnd)){
-            throw new BetahouseException(CommonResultCode.SYSTEM_ERROR,"当前时间不在扫章时间段内");
+        } else if (!DateUtil.nowIsBetween(activityStampedStart, activityStampedEnd)) {
+            throw new BetahouseException(CommonResultCode.SYSTEM_ERROR, "当前时间不在扫章时间段内");
         }
 
         // 盖章的userIds
@@ -142,7 +157,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     }
 
     @Override
-    public List<String> batchStampJson(importModel[] importModels,ActivityStampRequest request, OperateContext context) {
+    public List<String> batchStampJson(importModel[] importModels, ActivityStampRequest request, OperateContext context) {
         List<String> unStampRow = new ArrayList<>();
         for (int i = 0; i < importModels.length; i++) {
             //设置活动id
@@ -169,7 +184,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
             //设置时长
             if (importModels[i].getTime() == null) {
                 activityRecordDO.setTime(Double.valueOf(0).intValue());
-            }else {
+            } else {
                 activityRecordDO.setTime(Double.valueOf(importModels[i].getTime()).intValue());
             }
             activityRecordDO.setActivityRecordId(activityBizFactory.getActivityRecordId());
@@ -331,15 +346,15 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         String fileName = activityDO.getActivityName();
         List<ActivityRecordBO> activityRecordBOList = activityRecordManager.queryByActivityId(request.getActivityId());
         List<String> users = new LinkedList<>();
-        for (ActivityRecordBO activityRecordBO : activityRecordBOList){
+        for (ActivityRecordBO activityRecordBO : activityRecordBOList) {
             users.add(activityRecordBO.getUserId());
         }
         List<UserInfoBO> userInfoBOList = userInfoRepoService.batchQueryByUserIds(users);
         try {
-            List<Map<String,Object>> list=createExcelRecord(userInfoBOList);
-            String columnNames[] = {"学号","姓名","专业","年级","班级"};//列名
-            String keys[] = {"stuId","realName","majorId","grade","classId"};//map中的key
-            us.betahouse.util.utils.ExcelUtil.downloadWorkBook(list,keys,columnNames,fileName,response);
+            List<Map<String, Object>> list = createExcelRecord(userInfoBOList);
+            String columnNames[] = {"学号", "姓名", "专业", "年级", "班级"};//列名
+            String keys[] = {"stuId", "realName", "majorId", "grade", "classId"};//map中的key
+            us.betahouse.util.utils.ExcelUtil.downloadWorkBook(list, keys, columnNames, fileName, response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -347,21 +362,21 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
     }
 
     @Override
-    public List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList){
+    public List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList) {
         List<Map<String, Object>> listmap = new ArrayList<Map<String, Object>>();
         try {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("sheetName", "sheet1");
             listmap.add(map);
-            int i=1;
+            int i = 1;
             for (UserInfoBO userInfoBO : userInfoBOList) {
                 i++;
                 Map<String, Object> mapValue = new HashMap<String, Object>();
-                mapValue.put("stuId",userInfoBO.getStuId());
-                mapValue.put("realName",userInfoBO.getRealName());
-                mapValue.put("majorId",userInfoBO.getMajor());
-                mapValue.put("grade",userInfoBO.getGrade());
-                mapValue.put("classId",userInfoBO.getClassId());
+                mapValue.put("stuId", userInfoBO.getStuId());
+                mapValue.put("realName", userInfoBO.getRealName());
+                mapValue.put("majorId", userInfoBO.getMajor());
+                mapValue.put("grade", userInfoBO.getGrade());
+                mapValue.put("classId", userInfoBO.getClassId());
 
                 listmap.add(mapValue);
             }
@@ -370,6 +385,9 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         }
         return listmap;
     }
+
+
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -380,7 +398,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
             excelReader = ExcelUtil.getReader(multipartFile.getInputStream());
             System.out.println(multipartFile.getInputStream());
         } catch (Exception e) {
-            throw new BetahouseException(CommonResultCode.FORBIDDEN,"文件读取错误");
+            throw new BetahouseException(CommonResultCode.FORBIDDEN, "文件读取错误");
         }
         AssertUtil.assertBigger(2, excelReader.getRowCount(), CommonResultCode.FORBIDDEN.getCode(), "文件不得少于两行信息，本次批量导入未进行");
         List<List<Object>> read = excelReader.read(0, excelReader.getRowCount());
@@ -463,4 +481,133 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         AssertUtil.assertStringNotBlank(stampPermId, "活动没有盖章权限");
         return userBasicService.verifyPermissionByPermId(request.getScannerUserId(), Collections.singletonList(stampPermId));
     }
+    /**
+     * 获取用户课外学分
+     *
+     * @param userId
+     * @return
+     */
+
+    public Integer getCreditByUserId(String userId) {
+        Integer credit = 0;
+        Integer numberOfLectures =0;
+        Integer numberOfPractice =0;
+        Integer numberOfCulture =0;
+        Integer numberOfCertificate = 0;
+        List<ActivityRecordBO> activityRecordBOS = activityRecordRepoService.queryActivityRecordByUserId(userId);
+        List<CertificateBO> certificateBOS = competitionRepoService.queryByUserId(userId);
+        for (ActivityRecordBO activityRecord: activityRecordBOS
+             ) {
+            if (activityRecord.getType()==null){
+                continue;
+            }
+            //讲座
+            if (activityRecord.getType().equals(ActivityTypeEnum.LECTURE_ACTIVITY.getCode())){
+                numberOfLectures+=1;
+            }
+            //实践
+            if (activityRecord.getType().equals(ActivityTypeEnum.PRACTICE_ACTIVITY.getCode())){
+                numberOfPractice+=1;
+            }
+            //文化活动
+            if (activityRecord.getType().equals(ActivityTypeEnum.SCHOOL_ACTIVITY.getCode())){
+                numberOfCulture+=1;
+            }
+        }
+        for (CertificateBO certificateBO: certificateBOS
+             ) {
+            if (certificateBO.getType()==null){
+                continue;
+            }
+            //资格证书
+            if (certificateBO.getType().equals(CertificateTypeEnum.QUALIFICATIONS.getCode())){
+                numberOfCertificate+=1;
+            }
+            //教资证书
+            if (certificateBO.getType().equals(CertificateTypeEnum.TEACHER_QUALIFICATIONS.getCode())){
+                numberOfCertificate+=1;
+            }
+        }
+        if(numberOfLectures >=8){
+            credit+=1;
+        }
+        if((numberOfPractice >=2) || (numberOfPractice ==1 && numberOfCulture>=4) || numberOfCulture>=8){
+            credit+=1;
+        }
+        if(numberOfCertificate >=1){
+            credit+=1;
+        }
+        return credit;
+    }
+
+    /**
+     * 获取年级课外学分
+     *
+     *
+     * @return
+     */
+    @Cacheable(cacheNames = "Creditsstatistics")
+    public List<ActivityCreditsStatisticsBO> Creditsstatistics(){
+        List<ActivityCreditsStatisticsBO> list = new ArrayList<>();
+        List<UserInfoBO> allMajorAndGrade = userInfoRepoService.queryAllMajorAndGrade();
+        List<UserInfoDO> userInfoDOs = userInfoDORepo.getUserInfoDOByGrade();
+        for (UserInfoBO majorAndGrade:allMajorAndGrade
+             ) {
+            System.out.println(majorAndGrade);
+            list.add(new ActivityCreditsStatisticsBO(majorAndGrade.getGrade(),majorAndGrade.getMajor()));
+        }
+        for (UserInfoDO userInfoDO:userInfoDOs
+             ) {
+            ActivityCreditsStatisticsBO targetBo = null;
+            for (ActivityCreditsStatisticsBO activityCreditsStatisticsBO : list
+                 ) {
+                if (activityCreditsStatisticsBO.getMajorId()==null || activityCreditsStatisticsBO.getGrade()==null){
+                    continue;
+                }
+                if (activityCreditsStatisticsBO.getMajorId().equals(userInfoDO.getMajorId())
+                        && activityCreditsStatisticsBO.getGrade().equals(userInfoDO.getGrade())){
+                    targetBo = activityCreditsStatisticsBO;
+                }
+            }
+            Integer credit = getCreditByUserId(userInfoDO.getUserId());
+            if (targetBo != null) {
+                targetBo.addCreditStatistic(credit);
+                System.out.println(credit);
+            }
+        }
+        return list;
+    }
+
+    @CachePut(cacheNames = "Creditsstatistics")
+    public List<ActivityCreditsStatisticsBO> CreditsstatisticsPutCache() {
+        List<ActivityCreditsStatisticsBO> list = new ArrayList<>();
+        List<UserInfoBO> allMajorAndGrade = userInfoRepoService.queryAllMajorAndGrade();
+        List<UserInfoDO> userInfoDOs = userInfoDORepo.getUserInfoDOByGrade();
+        for (UserInfoBO majorAndGrade:allMajorAndGrade
+        ) {
+            System.out.println(majorAndGrade);
+            list.add(new ActivityCreditsStatisticsBO(majorAndGrade.getGrade(),majorAndGrade.getMajor()));
+        }
+        for (UserInfoDO userInfoDO:userInfoDOs
+        ) {
+            ActivityCreditsStatisticsBO targetBo = null;
+            for (ActivityCreditsStatisticsBO activityCreditsStatisticsBO : list
+            ) {
+                if (activityCreditsStatisticsBO.getMajorId()==null || activityCreditsStatisticsBO.getGrade()==null){
+                    continue;
+                }
+                if (activityCreditsStatisticsBO.getMajorId().equals(userInfoDO.getMajorId())
+                        && activityCreditsStatisticsBO.getGrade().equals(userInfoDO.getGrade())){
+                    targetBo = activityCreditsStatisticsBO;
+                }
+            }
+            Integer credit = getCreditByUserId(userInfoDO.getUserId());
+            if (targetBo != null) {
+                targetBo.addCreditStatistic(credit);
+                System.out.println(credit);
+            }
+        }
+        return list;
+    }
 }
+

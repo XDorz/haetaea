@@ -5,7 +5,9 @@
 package us.betahouse.haetae.serviceimpl.activity.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityCreditsStatisticsBO;
 import us.betahouse.haetae.activity.model.basic.importModel;
 import us.betahouse.haetae.serviceimpl.activity.model.ActivityRecordStatistics;
 import us.betahouse.haetae.serviceimpl.activity.model.StampRecord;
@@ -35,7 +37,7 @@ public interface ActivityRecordService {
      * @return 未盖上章的id
      */
     List<String> batchStamp(ActivityStampRequest request, OperateContext context);
-
+    List<ActivityCreditsStatisticsBO> CreditsstatisticsPutCache();
     /**
      * 批量盖章（导入json）
      *
@@ -127,4 +129,20 @@ public interface ActivityRecordService {
      * @return
      */
     List<Map<String, Object>> createExcelRecord(List<UserInfoBO> userInfoBOList);
+
+    /**
+     * 获取学分
+     *
+     * @param userid
+     * @return
+     */
+    Integer getCreditByUserId(String userId);
+
+    /**
+     * 统计各个年级专业的学分
+     *
+     *
+     * @return List<ActivityCreditsStatisticsBO>
+     */
+    public List<ActivityCreditsStatisticsBO> Creditsstatistics();
 }

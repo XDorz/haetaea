@@ -7,10 +7,9 @@ package us.betahouse.haetae.controller.activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.*;
+import us.betahouse.haetae.activity.model.basic.ActivityCreditsStatisticsBO;
 import us.betahouse.haetae.activity.model.basic.PositionRecordBO;
 import us.betahouse.haetae.common.log.LoggerName;
 import us.betahouse.haetae.common.session.CheckLogin;
@@ -19,6 +18,7 @@ import us.betahouse.haetae.common.template.RestOperateTemplate;
 import us.betahouse.haetae.model.activity.request.PositionRecordRestRequest;
 import us.betahouse.haetae.serviceimpl.activity.request.PositionRecordManagerRequest;
 import us.betahouse.haetae.serviceimpl.activity.request.builder.PositionRecordManagerRequestBuilder;
+import us.betahouse.haetae.serviceimpl.activity.service.ActivityRecordService;
 import us.betahouse.haetae.serviceimpl.activity.service.PositionRecordService;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.utils.IPUtil;
@@ -27,7 +27,8 @@ import us.betahouse.util.common.Result;
 import us.betahouse.util.enums.RestResultCode;
 import us.betahouse.util.log.Log;
 import us.betahouse.util.utils.AssertUtil;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -49,6 +50,8 @@ public class PositionRecordController {
     @Autowired
     private PositionRecordService positionRecordService;
 
+    @Autowired
+    private ActivityRecordService activityRecordService;
 
     /**
      * 获取个人履历
@@ -113,5 +116,34 @@ public class PositionRecordController {
                 return RestResultUtil.buildSuccessResult(positionRecordBOList, "获取组织人员列表成功");
             }
         });
+    }
+    @CheckLogin
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    @GetMapping(value = "/getActivityCredit")
+    public Result<String> getActivityCredit(PositionRecordRestRequest request, HttpServletRequest httpServletRequest) {
+        return RestOperateTemplate.operate(LOGGER, "获取学分统计", request, new RestOperateCallBack<String>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+                AssertUtil.assertStringNotBlank(request.getUserId(), RestResultCode.ILLEGAL_PARAMETERS.getCode(), "用户不能为空");
+            }
+
+            @Override
+            public Result<String> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                PositionRecordManagerRequest positionRecordManagerRequest = PositionRecordManagerRequestBuilder.getInstance()
+                        .withPositionRecordId(request.getPositionRecordId())
+                        .withUserId(request.getUserId())
+                        .build();
+                List<ActivityCreditsStatisticsBO> creditsstatistics = activityRecordService.Creditsstatistics();
+                return RestResultUtil.buildSuccessResult(JSON.toJSONString(creditsstatistics), "获取学分统计成功");
+            }
+        });
+    }
+    //每周三凌晨三点执行一次
+    @Scheduled(cron = "* * 3 * * 3 *")
+    public void getActivityCreditToCache() {
+        activityRecordService.CreditsstatisticsPutCache();
     }
 }

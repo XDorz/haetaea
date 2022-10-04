@@ -10,6 +10,7 @@ package us.betahouse.util.common;
  * @author dango.yxm
  * @version : Result.java 2018/10/06 下午2:13 dango.yxm
  */
+
 public class Result<T> extends ToString {
 
     private static final long serialVersionUID = 8597086345883261973L;
