@@ -118,4 +118,5 @@ public class ActivityRecordManagerImpl implements ActivityRecordManager {
     public List<ActivityRecordBO> queryByActivityId(String activityId) {
         return activityRecordRepoService.queryByActivityId(activityId);
     }
+
 }

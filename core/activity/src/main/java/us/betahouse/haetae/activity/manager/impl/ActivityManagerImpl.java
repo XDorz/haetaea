@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.activity.manager.impl;
 
+import cn.hutool.core.date.DateTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import us.betahouse.haetae.activity.dal.service.impl.ActivityRepoServiceImpl;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.manager.ActivityManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 import us.betahouse.haetae.activity.request.ActivityRequest;
@@ -246,12 +248,6 @@ public class ActivityManagerImpl implements ActivityManager {
     }
 
     @Override
-    public List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request) {
-        List<ActivityBO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
-        return  createdThisWeekNotPage;
-    }
-
-    @Override
     public PageList<ActivityBO> findCreatedThisWeek(ActivityRequest request) {
         return  activityRepoService.findCreatedThisWeek(request.getPage(), request.getLimit(),request.getActivityName());
     }
@@ -330,4 +326,57 @@ public class ActivityManagerImpl implements ActivityManager {
         return activityRepoService.queryCanceledActivityByUserId(request.getUserId(),request.getPage(), request.getLimit());
     }
 
+    @Override
+    public List<ActivityBO> findCreatedThisWeekNotPage(ActivityRequest request) {
+        List<ActivityBO> createdThisWeekNotPage = activityRepoService.findCreatedThisWeekNotPage(request.getActivityName());
+        return  createdThisWeekNotPage;
+    }
+
+    @Override
+    public Integer queryActualNumPastMonthByOrganizationMessage(ActivityRequest request) {
+        Integer queryActualNumPastMonthByOrganizationMessage = activityRepoService.queryActualNumPastMonthByOrganizationMessage(request.getOrganizationMessage());
+        return  queryActualNumPastMonthByOrganizationMessage;
+    }
+
+    @Override
+    public Integer querySignNumPastMonthByOrganizationMessage(ActivityRequest request) {
+        Integer querySignNumPastMonthByOrganizationMessage = activityRepoService.querySignNumPastMonthByOrganizationMessage(request.getOrganizationMessage());
+        return  querySignNumPastMonthByOrganizationMessage;
+    }
+
+    @Override
+    public Integer findLectureActivityNum(ActivityRequest request) {
+        Integer findLectureActivityNum = activityRepoService.findLectureActivityNum(request.getTerm());
+        return  findLectureActivityNum;
+    }
+
+    @Override
+    public Integer findSchoolActivityNum(ActivityRequest request) {
+        Integer findSchoolActivityNum = activityRepoService.findSchoolActivityNum(request.getTerm());
+        return  findSchoolActivityNum;
+    }
+
+    @Override
+    public Integer findAllActivityNum(ActivityRequest request) {
+        Integer findAllActivityNum = activityRepoService.findAllActivityNum(request.getTerm());
+        return  findAllActivityNum;
+    }
+
+    @Override
+    public List<String> findActivityName(ActivityRequest request) {
+        List<String> findActivityName = activityRepoService.findActivityName();
+        return  findActivityName;
+    }
+
+    @Override
+    public List<Date> findActivityTime(ActivityRequest request) {
+        List<Date> findActivityTime = activityRepoService.findActivityTime();
+        return  findActivityTime;
+    }
+
+    @Override
+    public List<String> findActivityLocation(ActivityRequest request) {
+        List<String> findActivityLocation = activityRepoService.findActivityLocation();
+        return  findActivityLocation;
+    }
 }

@@ -7,7 +7,6 @@ package us.betahouse.haetae.controller.activity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.csvreader.CsvWriter;
-import com.mysql.cj.xdevapi.JsonArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import us.betahouse.haetae.activity.dal.service.ActivityRecordRepoService;
 import us.betahouse.haetae.activity.dal.service.ActivityRepoService;
 import us.betahouse.haetae.activity.enums.ActivityRecordStateEnum;
-import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
 import us.betahouse.haetae.activity.manager.ActivityManager;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
+import us.betahouse.haetae.activity.model.basic.ActivitySignBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearnBatchBO;
 import us.betahouse.haetae.activity.model.basic.YouthLearningBO;
 import us.betahouse.haetae.activity.model.common.PageList;
@@ -34,8 +35,6 @@ import us.betahouse.haetae.model.activity.request.AuditRestRequest;
 import us.betahouse.haetae.model.activity.request.YouthLearnRequest;
 import us.betahouse.haetae.organization.dal.model.OrganizationDO;
 import us.betahouse.haetae.organization.dal.repo.OrganizationRepo;
-import us.betahouse.haetae.serviceimpl.activity.constant.ActivityCreatorId;
-import us.betahouse.haetae.serviceimpl.activity.constant.ActivityExtInfoKey;
 import us.betahouse.haetae.serviceimpl.activity.enums.ActivityOperationEnum;
 import us.betahouse.haetae.serviceimpl.activity.model.AuditMessage;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityManagerRequest;
@@ -47,19 +46,15 @@ import us.betahouse.haetae.serviceimpl.activity.service.impl.YouthLearningServic
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.utils.AuditUtil;
 import us.betahouse.haetae.serviceimpl.common.utils.TermUtil;
-import us.betahouse.haetae.serviceimpl.organization.service.OrganizationService;
 import us.betahouse.haetae.serviceimpl.schedule.manager.AccessTokenManage;
-import us.betahouse.haetae.serviceimpl.user.request.PermRequest;
 import us.betahouse.haetae.serviceimpl.user.service.PermService;
 import us.betahouse.haetae.serviceimpl.user.service.UserService;
 import us.betahouse.haetae.user.dal.service.PermRepoService;
-import us.betahouse.haetae.user.model.basic.perm.PermBO;
 import us.betahouse.haetae.utils.IPUtil;
 import us.betahouse.haetae.utils.RestResultUtil;
 import us.betahouse.util.common.Result;
 import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.enums.RestResultCode;
-import us.betahouse.util.exceptions.BetahouseException;
 import us.betahouse.util.log.Log;
 import us.betahouse.util.template.OperateCallBack;
 import us.betahouse.util.template.OperateTemplate;
@@ -68,7 +63,6 @@ import us.betahouse.util.utils.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -117,6 +111,10 @@ public class ActivityController {
 
     @Autowired
     private OrganizationRepo organizationRepo;
+
+    @Autowired
+    private ActivityRecordRepoService activityRecordRepoService;
+
     /**
      * 添加活动
      *
@@ -1379,6 +1377,111 @@ public class ActivityController {
                 YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
                 youthLearningRequest.setUserId(request.getUserId());
                 return RestResultUtil.buildSuccessResult(youthLearningService.getTermedRecordByUserId(youthLearningRequest));
+            }
+        });
+    }
+
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/queryActualNumPastMonthByOrganizationMessage")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<ActivitySignBO>> querySignNumPastMonthByOrganizationMessage(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "获取过去一个月内所有发起了报名的活动的报名总人数与实际参与的人数，按发起的社团分类，一个月以活动开始时间为准", request, new OperateCallBack<List<ActivitySignBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<List<ActivitySignBO>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
+                List<ActivitySignBO> activitySignBOS = new ArrayList<>();
+                List<OrganizationDO> all = organizationRepo.findAll();
+                for (int i = 0; i < all.size(); i++) {
+                    ActivitySignBO activitySignBO = new ActivitySignBO();
+                    activitySignBO.setOrganizationId(all.get(i).getOrganizationId());
+                    activitySignBO.setOrganizationMessage(all.get(i).getOrganizationName());
+                    builder.withOrganizationMessage(all.get(i).getOrganizationName());
+                    activitySignBO.setSignNumPastMonth(activityService.querySignNumPastMonthByOrganizationMessage(builder.build(), context));
+                    activitySignBO.setActualNumPastMonth(activityService.queryActualNumPastMonthByOrganizationMessage(builder.build(), context));
+                    activitySignBOS.add(activitySignBO);
+                }
+
+                return RestResultUtil.buildSuccessResult(activitySignBOS, "获取过去一个月内所有发起了报名的活动的报名总人数与实际参与的人数，按发起的社团分类，一个月以活动开始时间为准");
+            }
+        });
+    }
+
+    /**
+     * 查询当前学期校园活动数量和讲座活动数量和总活动数量
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/findSchoolAndLectureActivityNumAndAllNum")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<Integer>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Integer>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<List<Integer>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
+                List<Integer> integers = new ArrayList<>();
+                String term = TermUtil.getNowTerm();
+                builder.withTerm(term);
+                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
+                integers.add(activityService.findLectureActivityNum(builder.build(), context));
+                integers.add(activityService.findAllActivityNum(builder.build(), context));
+                return RestResultUtil.buildSuccessResult(integers, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
+            }
+        });
+    }
+
+    /**
+     * 查询活动名称，活动时间和活动地点
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
+    @CheckLogin
+    @GetMapping(value = "/findActivityTimeAndPosition")
+    @Log(loggerName = LoggerName.WEB_DIGEST)
+    public Result<List<ActivityNowLocationBO>> findActivityTimeAndPosition(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询活动名称，活动时间和活动地点", request, new OperateCallBack<List<ActivityNowLocationBO>>() {
+            @Override
+            public void before() {
+                AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
+            }
+            @Override
+            public Result<List<ActivityNowLocationBO>> execute() {
+                OperateContext context = new OperateContext();
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
+                List<ActivityNowLocationBO> activityNowLocationBOS = new ArrayList<>();
+                int size = activityService.findActivityName(builder.build(), context).size();
+                for(int i = 0; i < size; i ++ ){
+                    ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
+                    activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
+                    activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
+                    activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    activityNowLocationBOS.add(activityNowLocationBO);
+                }
+                return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");
             }
         });
     }

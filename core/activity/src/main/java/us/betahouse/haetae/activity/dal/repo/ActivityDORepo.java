@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.activity.dal.repo;
 
+import cn.hutool.core.date.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 
 import java.util.Date;
 import java.util.List;
@@ -267,19 +269,6 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             "and activity_stamped_start >= ?4 and activity_stamped_end <= ?5 and user_id in( select user_id from common_user_info where stu_id like ?1 ) ",nativeQuery = true)
     Page<ActivityDO> findCanceledBy(Pageable pageable,String stuId, String activityName, String organizationMessage , Date start, Date end);
 
-
-
-    /**
-     * 本周创建的活动查询 不分页
-     * @param activityName
-     * @return
-     */
-    //
-    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
-            ,nativeQuery = true)
-    List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
-
-
     /**
      * 本周创建的活动分页查询
      * @param pageable
@@ -324,7 +313,86 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             ,nativeQuery = true)
     Page<ActivityDO> findCanceledByUserId(Pageable pageable, String userId);
 
+    /**
+     * 本周创建的活动查询 不分页
+     * @param activityName
+     * @return
+     */
+    @Query(value = "select * from activity where gmt_create >=(select date_format(subdate(now(),WEEKDAY(CURDATE())),'%Y-%m-%d')) and activity_name like ?1"
+            ,nativeQuery = true)
+    List<ActivityDO> findCreatedThisWeekNotPage(String activityName);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param organizationMessage
+     * @return
+     */
+    @Query(value = "select count(*) from activity_record where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+            ,nativeQuery = true)
+    Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param organizationMessage
+     * @return
+     */
+    @Query(value = "select sum(number) from activity_entry where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+            ,nativeQuery = true)
+
+    Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
+
+    /**
+     * 查找本学期的讲座活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where type = 'lectureActivity' and state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findLectureActivityNum(String term);
+
+    /**
+     * 查找本学期的校园活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where type = 'schoolActivity' and state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findSchoolActivityNum(String term);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param term
+     * @return
+     */
+    @Query(value = "select count(*) from activity where state in ('PUBLISHED','RESTARTED','FINISHED') and term = ?1"
+            ,nativeQuery = true)
+    Integer findAllActivityNum(String term);
+
+    /**
+     * 查询活动名称
+     *
+     * @return
+     */
+    @Query(value = "select activity_name from activity where now() < end"
+            ,nativeQuery = true)
+    List<String> findActivityName();
+
+    /**
+     * 查询活动时间
+     *
+     * @return
+     */
+    @Query(value = "select start from activity where now() < end"
+            ,nativeQuery = true)
+    List<Date> findActivityTime();
+
+    /**
+     * 查询活动地点
+     *
+     * @return
+     */
+    @Query(value = "select location from activity where now() < end"
+            ,nativeQuery = true)
+    List<String> findActivityLocation();
 
 }

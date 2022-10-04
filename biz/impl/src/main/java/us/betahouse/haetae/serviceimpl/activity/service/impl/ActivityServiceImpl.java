@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import us.betahouse.haetae.serviceimpl.activity.constant.*;
 import us.betahouse.haetae.serviceimpl.activity.enums.ActivityPermTypeEnum;
 import us.betahouse.haetae.serviceimpl.activity.manager.ActivityOperateManager;
 import us.betahouse.haetae.serviceimpl.activity.request.ActivityManagerRequest;
+import us.betahouse.haetae.serviceimpl.activity.request.YouthLearningRequest;
 import us.betahouse.haetae.serviceimpl.activity.service.ActivityService;
 import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyPerm;
@@ -735,6 +737,59 @@ public class ActivityServiceImpl implements ActivityService {
         re.setLimit(limit);
         re.setOrderRule(orderRule);
         return activityManager.findCanceledByUserId(re);
+    }
+
+    @Override
+    public Integer queryActualNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setOrganizationMessage(request.getOrganizationMessage());
+        return activityManager.queryActualNumPastMonthByOrganizationMessage(re);
+    }
+
+    @Override
+    public Integer querySignNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setOrganizationMessage(request.getOrganizationMessage());
+        return activityManager.querySignNumPastMonthByOrganizationMessage(re);
+    }
+
+    @Override
+    public Integer findLectureActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findLectureActivityNum(re);
+    }
+
+    @Override
+    public Integer findSchoolActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findSchoolActivityNum(re);
+    }
+
+    @Override
+    public Integer findAllActivityNum(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        re.setTerm(request.getTerm());
+        return activityManager.findAllActivityNum(re);
+    }
+
+    @Override
+    public List<String> findActivityName(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityName(re);
+    }
+
+    @Override
+    public List<Date> findActivityTime(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityTime(re);
+    }
+
+    @Override
+    public List<String> findActivityLocation(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityLocation(re);
     }
 
 }

@@ -4,8 +4,11 @@
  */
 package us.betahouse.haetae.activity.dal.service;
 
+import cn.hutool.core.date.DateTime;
+import org.springframework.data.jpa.repository.Query;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
+import us.betahouse.haetae.activity.model.basic.ActivityNowLocationBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
 
@@ -231,15 +234,6 @@ public interface ActivityRepoService {
     PageList<ActivityBO> findCanceledBy(String stuId,String activityName,String organizationMessage
             ,Long start,Long end,Integer page,Integer limit) throws ParseException;
 
-
-
-    /**
-     * 查找本周创建的活动 不分页
-     * @param activityName
-     * @return
-     */
-    List<ActivityBO> findCreatedThisWeekNotPage(String activityName);
-
     /**
      * 查找本周创建的活动
      * @param page
@@ -299,11 +293,66 @@ public interface ActivityRepoService {
      */
     PageList<ActivityBO> queryCanceledActivityByUserId(String userId,Integer page,Integer limit);
 
+    /**
+     * 查找本周创建的活动 不分页
+     * @param activityName
+     * @return
+     */
+    List<ActivityBO> findCreatedThisWeekNotPage(String activityName);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param organizationMessage
+     * @return
+     */
+    Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param organizationMessage
+     * @return
+     */
+    Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
 
+    /**
+     * 查找本学期的讲座活动数量
+     * @param term
+     * @return
+     */
+    Integer findLectureActivityNum(String term);
 
+    /**
+     * 查找本学期的校园活动数量
+     * @param term
+     * @return
+     */
+    Integer findSchoolActivityNum(String term);
 
+    /**
+     * 查找本学期的总活动数量
+     * @param term
+     * @return
+     */
+    Integer findAllActivityNum(String term);
 
+    /**
+     * 查询活动名称
+     *
+     * @return
+     */
+    List<String> findActivityName();
 
+    /**
+     * 查询活动时间
+     *
+     * @return
+     */
+    List<Date> findActivityTime();
+
+    /**
+     * 查询活动地点
+     *
+     * @return
+     */
+    List<String> findActivityLocation();
 }

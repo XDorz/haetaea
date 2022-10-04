@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.request;
 
+import org.aspectj.weaver.ast.Or;
 import us.betahouse.haetae.activity.enums.ActivityRecordExtInfoKey;
 import us.betahouse.haetae.activity.request.ActivityRecordRequest;
 import us.betahouse.haetae.serviceimpl.common.verify.VerifyRequest;

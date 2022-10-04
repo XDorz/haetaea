@@ -4,6 +4,7 @@
  */
 package us.betahouse.haetae.serviceimpl.activity.service;
 
+import cn.hutool.core.date.DateTime;
 import us.betahouse.haetae.activity.model.basic.ActivityBO;
 import us.betahouse.haetae.activity.model.basic.PastActivityBO;
 import us.betahouse.haetae.activity.model.common.PageList;
@@ -12,6 +13,7 @@ import us.betahouse.haetae.serviceimpl.common.OperateContext;
 import us.betahouse.haetae.user.model.basic.UserInfoBO;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -248,7 +250,67 @@ public interface ActivityService {
      */
     PageList<ActivityBO> findCanceledByUserId(ActivityManagerRequest request, OperateContext context);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的实际参与的人数
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer queryActualNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context);
 
+    /**
+     * 根据单位信息查询过去一个月内所有发起了报名的活动的报名总人数
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer querySignNumPastMonthByOrganizationMessage(ActivityManagerRequest request, OperateContext context);
 
+    /**
+     * 查找本学期的讲座活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findLectureActivityNum(ActivityManagerRequest request, OperateContext context);
 
+    /**
+     * 查找本学期的校园活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findSchoolActivityNum(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查找本学期的总活动数量
+     * @param request
+     * @param context
+     * @return
+     */
+    Integer findAllActivityNum(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动名称
+     * @param request
+     * @param context
+     * @return
+     */
+    List<String> findActivityName(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动时间
+     * @param request
+     * @param context
+     * @return
+     */
+    List<Date> findActivityTime(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动地点
+     * @param request
+     * @param context
+     * @return
+     */
+    List<String> findActivityLocation(ActivityManagerRequest request, OperateContext context);
 }
