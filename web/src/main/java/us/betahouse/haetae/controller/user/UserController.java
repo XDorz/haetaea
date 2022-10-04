@@ -749,7 +749,7 @@ public class UserController {
             @Override
             public Result<PageList<UserFeedBackBO>> execute() {
                 UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
-                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setPageable(request.getPageable());
                 feedBackRequest.setUserId(request.getUserId());
                 feedBackRequest.setTargetId(request.getTargetId());
                 return RestResultUtil.buildSuccessResult(userFeedBackService.getFeedBackByUserId(feedBackRequest),"查询用户反馈记录成功");
@@ -770,7 +770,7 @@ public class UserController {
             @Override
             public Result<PageList<UserFeedBackBO>> execute() {
                 UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
-                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setPageable(request.getPageable());
                 feedBackRequest.setUserId(request.getUserId());
                 return RestResultUtil.buildSuccessResult(userFeedBackService.getAllFeedBack(feedBackRequest),"查询所有反馈记录成功");
             }
@@ -791,7 +791,7 @@ public class UserController {
             @Override
             public Result<PageList<UserFeedBackBO>> execute() {
                 UserFeedBackRequest feedBackRequest=new UserFeedBackRequest();
-                feedBackRequest.setPageable(feedBackRequest.getPageable());
+                feedBackRequest.setPageable(request.getPageable());
                 feedBackRequest.setVersion(request.getVersion());
                 feedBackRequest.setUserId(request.getUserId());
                 return RestResultUtil.buildSuccessResult(userFeedBackService.getAllFeedBackByVersion(feedBackRequest),"用户查询反馈记录成功");
@@ -808,6 +808,9 @@ public class UserController {
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
                 AssertUtil.assertNotNull(request.getUserId(),RestResultCode.UNAUTHORIZED);
+                AssertUtil.assertNotNull(request.getContext(),RestResultCode.ILLEGAL_PARAMETERS.getCode(),"反馈内容不能为空");
+                AssertUtil.assertNotNull(request.getVersion(),RestResultCode.ILLEGAL_PARAMETERS.getCode(),"反馈的版本信息不能为空");
+                AssertUtil.assertNotNull(request.getContext(),RestResultCode.ILLEGAL_PARAMETERS.getCode(),"反馈内容不能为空");
             }
             @Override
             public Result<Void> execute() {

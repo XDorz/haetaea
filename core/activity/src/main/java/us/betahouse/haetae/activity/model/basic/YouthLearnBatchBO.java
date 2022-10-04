@@ -8,15 +8,25 @@ public class YouthLearnBatchBO {
     /**
      * 青年大学习期数名称
      */
-    Set<String> activityName;
+    List<String> activityName;
 
     /**
      * 未做的期数
      */
-    Set<String> undo;
+    List<String> undo;
 
     /**
-     * 一批青年大学习
+     * 青年大学习排序后(含做的和未做的)
+     */
+    List<String> sortedActivityName;
+
+    /**
+     * 未做的期数在排序后的位置
+     */
+    List<Integer> undoLocation;
+
+    /**
+     * 已做大学习信息
      */
     List<YouthLearningBO> youthLearn;
 
@@ -25,20 +35,36 @@ public class YouthLearnBatchBO {
      */
     String term;
 
-    public Set<String> getActivityName() {
+    public List<String> getActivityName() {
         return activityName;
     }
 
-    public void setActivityName(Set<String> activityName) {
+    public void setActivityName(List<String> activityName) {
         this.activityName = activityName;
     }
 
-    public Set<String> getUndo() {
+    public List<String> getUndo() {
         return undo;
     }
 
-    public void setUndo(Set<String> undo) {
+    public void setUndo(List<String> undo) {
         this.undo = undo;
+    }
+
+    public List<String> getSortedActivityName() {
+        return sortedActivityName;
+    }
+
+    public List<Integer> getUndoLocation() {
+        return undoLocation;
+    }
+
+    public void setUndoLocation(List<Integer> undoLocation) {
+        this.undoLocation = undoLocation;
+    }
+
+    public void setSortedActivityName(List<String> sortedActivityName) {
+        this.sortedActivityName = sortedActivityName;
     }
 
     public List<YouthLearningBO> getYouthLearn() {

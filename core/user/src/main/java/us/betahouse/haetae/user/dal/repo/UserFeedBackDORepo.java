@@ -33,13 +33,13 @@ public interface UserFeedBackDORepo extends JpaRepository<UserFeedBackDO, Long> 
     /**
      * 查找所有回馈
      */
-    @Query(value = "select * from user_feedback where feedback_head_id=null",nativeQuery = true)
+    @Query(value = "select * from user_feedback where feedback_head_id is null",nativeQuery = true)
     Page<UserFeedBackDO> findAllFeedBack(Pageable pageable);
 
     /**
      * 通过当前版本查找
      */
-    @Query(value = "select * from user_feedback where feedback_head_id=null and app_version=?1",nativeQuery = true)
+    @Query(value = "select * from user_feedback where feedback_head_id is null and app_version=?1",nativeQuery = true)
     Page<UserFeedBackDO> findAllFeedBackByVersion(String version,Pageable pageable);
 
 }

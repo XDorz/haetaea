@@ -307,7 +307,7 @@ public class EntityConverter {
         }
         list.add(added);
         while (added.getFeedBackNext()!=null){
-            added=userFeedBackDORepo.findAllByFeedBackId(userFeedBackDO.getFeedBackNext());
+            added=userFeedBackDORepo.findAllByFeedBackId(added.getFeedBackNext());
             AssertUtil.assertNotNull(added,"系统错误，查询不到回馈链！");
             list.add(added);
         }

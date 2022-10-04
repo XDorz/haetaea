@@ -14,6 +14,8 @@ public enum UserManagerPermTypeEnum implements PermType {
      * 用户密码重置
      */
     USER_PASSWORD_RESET(UserPermType.USER_PASSWORD_RESET,"重置用户密码",true),
+
+    USER_FEEDBACK_MANAGER(UserPermType.USER_FEEDBACK_MANAGER,"查看用户反馈权限",true)
     ;
 
     private String code;

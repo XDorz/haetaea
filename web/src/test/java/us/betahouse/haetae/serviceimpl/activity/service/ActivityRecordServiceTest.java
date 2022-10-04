@@ -936,7 +936,7 @@ public class ActivityRecordServiceTest {
 
     @Test
     public void exportYounthLearn(){
-        String name="2022年第20期";
+        String name="2022年第21期";
         ActivityDO activityDO = activityDORepo.findByActivityName(name);
         List<YouthLearningDO> youthLearningDOS = youthLearningDORepo.findAllByActivityId(activityDO.getActivityId());
         cn.hutool.core.text.csv.CsvWriter writer = cn.hutool.core.text.csv.CsvUtil.getWriter(System.getProperty("user.home") + "/desktop/result.csv", StandardCharsets.UTF_8);

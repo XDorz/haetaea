@@ -46,7 +46,7 @@ public class UserFeedBackDO extends BaseDO{
     /**
      * 下一个评论的id(暂定？)
      */
-    @Column(name = "feedback_next_id", length = 32, updatable = false, nullable = false)
+    @Column(name = "feedback_next_id", length = 32, updatable = false)
     private String feedBackNext;
 
     /**

@@ -1363,9 +1363,9 @@ public class ActivityController {
         });
     }
 
-    //todo 对结果进行排序！！！regex！
+
     @CheckLogin
-    @PostMapping(value = "/youthlearning/selflearn")
+    @GetMapping(value = "/youthlearning/selflearn")
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<List<YouthLearnBatchBO>> getSelfYouthLearnRecord(YouthLearnRequest request, HttpServletRequest httpServletRequest){
         return OperateTemplate.operate(LOGGER, "个人获取大学习记录情况", request, new OperateCallBack<List<YouthLearnBatchBO>>() {

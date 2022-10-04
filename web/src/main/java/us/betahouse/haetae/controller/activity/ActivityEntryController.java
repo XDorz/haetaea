@@ -64,7 +64,6 @@ public class ActivityEntryController {
     @Autowired
     private ActivityRepoService activityRepoService;
 
-    //todo 报名活动完成扫码，top排在前面
     @CheckLogin
     @GetMapping
     @Log(loggerName = LoggerName.WEB_DIGEST)

@@ -23,8 +23,10 @@ import us.betahouse.util.enums.CommonResultCode;
 import us.betahouse.util.utils.AssertUtil;
 import us.betahouse.util.utils.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +49,10 @@ public class YouthLearningServiceImpl implements YouthLearningService {
 
     @Autowired
     UserInfoDORepo userInfoDORepo;
+
+    private Comparator<String> youthLearnComparator;
+
+    private Comparator<YouthLearningBO> youthLearnBOComparator;
 
     @Override
     @VerifyPerm(permType={ActivityPermType.ACTIVITY_CREATE})
@@ -142,13 +150,116 @@ public class YouthLearningServiceImpl implements YouthLearningService {
             Set<String> set = map.get(s);
             set.removeAll(activityNameSet);
             YouthLearnBatchBO youthLearnBatchBO=new YouthLearnBatchBO();
-            youthLearnBatchBO.setUndo(set);
+            List<String> undo=new ArrayList<>(set);
+            undo.sort(youthLearnComparator);
+            youthLearnBatchBO.setUndo(undo);
             youthLearnBatchBO.setTerm(s);
-            youthLearnBatchBO.setActivityName(activityNameSet);
+            List<String> nameList=new ArrayList<>(activityNameSet);
+            nameList.sort(youthLearnComparator);
+            youthLearnBatchBO.setActivityName(nameList);
+            List<String> allName=new ArrayList<>(nameList);
+            allName.addAll(undo);
+            allName.sort(youthLearnComparator);
+            youthLearnBatchBO.setSortedActivityName(allName);
+            List<Integer> location=new ArrayList<>();
+            if(undo.size()!=0){
+                int i=0;
+                int j=0;
+                String undoName=undo.get(j);
+                for (String name : allName) {
+                    if(name.equals(undoName)){
+                        j++;
+                        location.add(i);
+                        if(j==undo.size()) break;
+                        undoName=undo.get(j);
+                    }
+                    i++;
+                }
+            }
+            youthLearnBatchBO.setUndoLocation(location);
+            youthLearningBOS.sort(youthLearnBOComparator);
             youthLearnBatchBO.setYouthLearn(youthLearningBOS);
             list.add(youthLearnBatchBO);
         }
         return list;
+    }
+
+    @PostConstruct
+    private void initComparator(){
+
+        this.youthLearnComparator=new Comparator<String>() {
+            Pattern pattern=Pattern.compile("第[ ]?(\\d+)[ ]?期");
+            Pattern yearPattern=Pattern.compile("^(\\d+)年");
+
+            @Override
+            public int compare(String o1, String o2) {
+                Matcher matcher1 = pattern.matcher(o1);
+                Matcher matcher2 = pattern.matcher(o2);
+                //年份检测
+                Matcher matcher3=yearPattern.matcher(o1);
+                Matcher matcher4=yearPattern.matcher(o2);
+                //默认年份一定都有
+                matcher3.find();
+                matcher4.find();
+                int y1=Integer.parseInt(matcher3.group(1));
+                int y2=Integer.parseInt(matcher4.group(1));
+                if(y1>y2) return y1-y2;
+                //期数检测
+                boolean m1=matcher1.find();
+                boolean m2=matcher2.find();
+                if(m1&&m2){
+                    int num1=Integer.parseInt(matcher1.group(1));
+                    int num2=Integer.parseInt(matcher2.group(1));
+                    return num1-num2;
+                }else if(!m1&&m2){
+                    return 1;
+                }else if(m1){
+                    return -1;
+                }else {
+                    ActivityDO activity1 = activityDORepo.findAllByActivityNameAndStateNot(o1, ActivityStateEnum.CANCELED.getCode());
+                    ActivityDO activity2 = activityDORepo.findAllByActivityNameAndStateNot(o2,ActivityStateEnum.CANCELED.getCode());
+                    return (int)(activity1.getStart().getTime()-activity2.getStart().getTime());
+                }
+            }
+        };
+
+        this.youthLearnBOComparator=new Comparator<YouthLearningBO>() {
+            Pattern pattern=Pattern.compile("第[ ]?(\\d+)[ ]?期");
+            Pattern yearPattern=Pattern.compile("^(\\d+)年");
+
+            @Override
+            public int compare(YouthLearningBO bo1, YouthLearningBO bo2) {
+                String o1=bo1.getActivityName();
+                String o2=bo2.getActivityName();
+                Matcher matcher1 = pattern.matcher(o1);
+                Matcher matcher2 = pattern.matcher(o2);
+                //年份检测
+                Matcher matcher3=yearPattern.matcher(o1);
+                Matcher matcher4=yearPattern.matcher(o2);
+                //默认年份一定都有
+                matcher3.find();
+                matcher4.find();
+                int y1=Integer.parseInt(matcher3.group(1));
+                int y2=Integer.parseInt(matcher4.group(1));
+                if(y1>y2) return y1-y2;
+                //期数检测
+                boolean m1=matcher1.find();
+                boolean m2=matcher2.find();
+                if(m1&&m2){
+                    int num1=Integer.parseInt(matcher1.group(1));
+                    int num2=Integer.parseInt(matcher2.group(1));
+                    return num1-num2;
+                }else if(!m1&&m2){
+                    return 1;
+                }else if(m1){
+                    return -1;
+                }else {
+                    ActivityDO activity1 = activityDORepo.findAllByActivityNameAndStateNot(o1, ActivityStateEnum.CANCELED.getCode());
+                    ActivityDO activity2 = activityDORepo.findAllByActivityNameAndStateNot(o2,ActivityStateEnum.CANCELED.getCode());
+                    return (int)(activity1.getStart().getTime()-activity2.getStart().getTime());
+                }
+            }
+        };
     }
 
     private YouthLearningBO fill(YouthLearningBO youthLearningBO){

@@ -24,19 +24,19 @@ public class UserFeedBackServiceImpl implements UserFeedBackService {
     }
 
     @Override
-    @VerifyPerm(permType = UserPermType.USER_PASSWORD_RESET)
+    @VerifyPerm(permType = UserPermType.USER_FEEDBACK_MANAGER)
     public PageList<UserFeedBackBO> getFeedBackByUserId(UserFeedBackRequest request) {
         return userFeedBackRepoService.getUserFeedBackByUserId(request.getUserId(),request.getPageable());
     }
 
     @Override
-    @VerifyPerm(permType = UserPermType.USER_PASSWORD_RESET)
+    @VerifyPerm(permType = UserPermType.USER_FEEDBACK_MANAGER)
     public PageList<UserFeedBackBO> getAllFeedBack(UserFeedBackRequest request) {
         return userFeedBackRepoService.getAllFeedBack(request.getPageable());
     }
 
     @Override
-    @VerifyPerm(permType = UserPermType.USER_PASSWORD_RESET)
+    @VerifyPerm(permType = UserPermType.USER_FEEDBACK_MANAGER)
     public PageList<UserFeedBackBO> getAllFeedBackByVersion(UserFeedBackRequest request) {
         return userFeedBackRepoService.getAllFeedBackByVersion(request.getVersion(),request.getPageable());
     }
