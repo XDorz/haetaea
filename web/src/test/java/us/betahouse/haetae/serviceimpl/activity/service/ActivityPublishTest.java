@@ -25,11 +25,7 @@ public class ActivityPublishTest {
     ActivityManager activityManager;
     @Autowired
     ActivityEntryService activityEntryService;
-
-
-    private String APP_ID = "wx64d266213824cd8e";
-
-    private String SECRET ="d199aa9d2300dc1226cf505930ca6d7b";
+    
     /**
      * 每天早上七点 查询是否有活动需要发布
      *
