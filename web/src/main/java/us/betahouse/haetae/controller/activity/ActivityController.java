@@ -66,10 +66,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1404,24 +1401,30 @@ public class ActivityController {
     @CheckLogin
     @GetMapping(value = "/findSchoolAndLectureActivityNumAndAllNum")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<List<Integer>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
-        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Integer>>() {
+    public Result<List<Map<String, Integer>>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Map<String, Integer>>>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
             }
             @Override
-            public Result<List<Integer>> execute() {
+            public Result<List<Map<String, Integer>>> execute() {
                 OperateContext context = new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
-                List<Integer> integers = new ArrayList<>();
+                List<Map<String, Integer>> list = new ArrayList();
                 String term = TermUtil.getNowTerm();
                 builder.withTerm(term);
-                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
-                integers.add(activityService.findLectureActivityNum(builder.build(), context));
-                integers.add(activityService.findAllActivityNum(builder.build(), context));
-                return RestResultUtil.buildSuccessResult(integers, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
+                Map<String, Integer> map = new HashMap<>();
+                map.put("校园活动数量", activityService.findSchoolActivityNum(builder.build(), context));
+                Map<String, Integer> map1 = new HashMap<>();
+                map1.put("讲座活动数量", activityService.findLectureActivityNum(builder.build(), context));
+                Map<String, Integer> map2 = new HashMap<>();
+                map2.put("总活动数量", activityService.findAllActivityNum(builder.build(), context));
+                list.add(map);
+                list.add(map1);
+                list.add(map2);
+                return RestResultUtil.buildSuccessResult(list, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
             }
         });
     }
