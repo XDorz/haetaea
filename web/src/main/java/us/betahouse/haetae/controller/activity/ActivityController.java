@@ -1456,7 +1456,13 @@ public class ActivityController {
                     ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
                     activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
                     activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
-                    activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("操场")){
+                        activityNowLocationBO.setLocation("风雨操场");
+                    }else if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("线下")){
+                        activityNowLocationBO.setLocation("教学楼");
+                    }else{
+                        activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    }
                     activityNowLocationBOS.add(activityNowLocationBO);
                 }
                 return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");
