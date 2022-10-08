@@ -142,7 +142,7 @@ public class PositionRecordController {
         });
     }
     //每周三凌晨三点执行一次
-    @Scheduled(cron = "* * 3 * * 3 *")
+    @Scheduled(cron = "0 0 3 ? * 3 ")
     public void getActivityCreditToCache() {
         activityRecordService.CreditsstatisticsPutCache();
     }

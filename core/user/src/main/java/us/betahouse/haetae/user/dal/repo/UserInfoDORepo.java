@@ -438,6 +438,6 @@ public interface UserInfoDORepo extends JpaRepository<UserInfoDO, Long> {
     @Query(value = "select count(*) from certificate_qualifications_record where status = 'APPROVED' and certificate_name not in ('英语四六级证书','浙江省高等学校计算机等级考试证书','浙江省高等学校计算机等级考试') and user_id = ?",nativeQuery = true)
     int getCertificateNumByUserId(String userId);
 
-    @Query(value = "select * from common_user_info where grade in ("2018","2019","2020","2021") GROUP BY major_id,grade,user_id", nativeQuery = true)
+    @Query(value = "select * from common_user_info where grade in ('2018','2019','2020','2021') GROUP BY major_id,grade,user_id", nativeQuery = true)
     List<UserInfoDO> getUserInfoDOByGrade();
 }

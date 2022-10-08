@@ -553,7 +553,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
         List<UserInfoDO> userInfoDOs = userInfoDORepo.getUserInfoDOByGrade();
         for (UserInfoBO majorAndGrade:allMajorAndGrade
              ) {
-            System.out.println(majorAndGrade);
+//            System.out.println(majorAndGrade);
             list.add(new ActivityCreditsStatisticsBO(majorAndGrade.getGrade(),majorAndGrade.getMajor()));
         }
         for (UserInfoDO userInfoDO:userInfoDOs
@@ -572,7 +572,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
             Integer credit = getCreditByUserId(userInfoDO.getUserId());
             if (targetBo != null) {
                 targetBo.addCreditStatistic(credit);
-                System.out.println(credit);
+//                System.out.println(credit);
             }
         }
         return list;
@@ -604,7 +604,7 @@ public class ActivityRecordServiceImpl implements ActivityRecordService {
             Integer credit = getCreditByUserId(userInfoDO.getUserId());
             if (targetBo != null) {
                 targetBo.addCreditStatistic(credit);
-                System.out.println(credit);
+//                System.out.println(credit);
             }
         }
         return list;

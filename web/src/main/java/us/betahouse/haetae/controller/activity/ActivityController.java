@@ -1473,12 +1473,15 @@ public class ActivityController {
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
                 List<ActivityNowLocationBO> activityNowLocationBOS = new ArrayList<>();
-                int size = activityService.findActivityName(builder.build(), context).size();
+                List<String> names = activityService.findActivityName(builder.build(), context);
+                List<Date> times = activityService.findActivityTime(builder.build(), context);
+                List<String> locations = activityService.findActivityLocation(builder.build(), context);
+                int size=names.size();
                 for(int i = 0; i < size; i ++ ){
                     ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
-                    activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
-                    activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
-                    activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    activityNowLocationBO.setActivity_name(names.get(i));
+                    activityNowLocationBO.setStart(times.get(i));
+                    activityNowLocationBO.setLocation(locations.get(i));
                     activityNowLocationBOS.add(activityNowLocationBO);
                 }
                 return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");
