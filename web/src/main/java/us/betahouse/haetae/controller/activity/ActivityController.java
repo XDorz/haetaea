@@ -67,10 +67,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1429,24 +1426,30 @@ public class ActivityController {
     @CheckLogin
     @GetMapping(value = "/findSchoolAndLectureActivityNumAndAllNum")
     @Log(loggerName = LoggerName.WEB_DIGEST)
-    public Result<List<Integer>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
-        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Integer>>() {
+    public Result<List<Map<String, Integer>>> findSchoolAndLectureActivityNumAndAllNum(ActivityRestRequest request, HttpServletRequest httpServletRequest) {
+        return OperateTemplate.operate(LOGGER, "查询当前学期校园活动数量和讲座活动数量和总活动数量", request, new OperateCallBack<List<Map<String, Integer>>>() {
             @Override
             public void before() {
                 AssertUtil.assertNotNull(request, RestResultCode.ILLEGAL_PARAMETERS.getCode(), "请求体不能为空");
             }
             @Override
-            public Result<List<Integer>> execute() {
+            public Result<List<Map<String, Integer>>> execute() {
                 OperateContext context = new OperateContext();
                 context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
-                List<Integer> integers = new ArrayList<>();
+                List<Map<String, Integer>> list = new ArrayList();
                 String term = TermUtil.getNowTerm();
                 builder.withTerm(term);
-                integers.add(activityService.findSchoolActivityNum(builder.build(), context));
-                integers.add(activityService.findLectureActivityNum(builder.build(), context));
-                integers.add(activityService.findAllActivityNum(builder.build(), context));
-                return RestResultUtil.buildSuccessResult(integers, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
+                Map<String, Integer> map = new HashMap<>();
+                map.put("校园活动数量", activityService.findSchoolActivityNum(builder.build(), context));
+                Map<String, Integer> map1 = new HashMap<>();
+                map1.put("讲座活动数量", activityService.findLectureActivityNum(builder.build(), context));
+                Map<String, Integer> map2 = new HashMap<>();
+                map2.put("总活动数量", activityService.findAllActivityNum(builder.build(), context));
+                list.add(map);
+                list.add(map1);
+                list.add(map2);
+                return RestResultUtil.buildSuccessResult(list, "查询当前学期校园活动数量和讲座活动数量和总活动数量");
             }
         });
     }
@@ -1479,9 +1482,15 @@ public class ActivityController {
                 int size=names.size();
                 for(int i = 0; i < size; i ++ ){
                     ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
-                    activityNowLocationBO.setActivity_name(names.get(i));
-                    activityNowLocationBO.setStart(times.get(i));
-                    activityNowLocationBO.setLocation(locations.get(i));
+                    activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
+                    activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
+                    if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("操场")){
+                        activityNowLocationBO.setLocation("风雨操场");
+                    }else if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("线下")){
+                        activityNowLocationBO.setLocation("教学楼");
+                    }else{
+                        activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                    }
                     activityNowLocationBOS.add(activityNowLocationBO);
                 }
                 return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");

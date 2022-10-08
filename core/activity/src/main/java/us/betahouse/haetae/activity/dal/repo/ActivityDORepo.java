@@ -327,7 +327,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param organizationMessage
      * @return
      */
-    @Query(value = "select count(*) from activity_record where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+    @Query(value = "select count(*) from activity_record where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 month)) and now())"
             ,nativeQuery = true)
     Integer queryActualNumPastMonthByOrganizationMessage(String organizationMessage);
 
@@ -336,7 +336,7 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
      * @param organizationMessage
      * @return
      */
-    @Query(value = "select sum(number) from activity_entry where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 year)) and now())"
+    @Query(value = "select sum(number) from activity_entry where activity_id in (select activity_id from activity where organization_message like ?1 and state in ('PUBLISHED','RESTARTED','FINISHED') and start between (select DATE_ADD(now(),interval -1 month)) and now())"
             ,nativeQuery = true)
 
     Integer querySignNumPastMonthByOrganizationMessage(String organizationMessage);
