@@ -576,4 +576,9 @@ public class ActivityRepoServiceImpl implements ActivityRepoService {
     public List<String> findActivityLocation() {
         return activityDORepo.findActivityLocation();
     }
+
+    @Override
+    public List<String> findActivityType() {
+        return activityDORepo.findActivityType();
+    }
 }

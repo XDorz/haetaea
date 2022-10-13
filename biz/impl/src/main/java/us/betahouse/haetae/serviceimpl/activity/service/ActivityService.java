@@ -313,4 +313,12 @@ public interface ActivityService {
      * @return
      */
     List<String> findActivityLocation(ActivityManagerRequest request, OperateContext context);
+
+    /**
+     * 查询活动类型
+     * @param request
+     * @param context
+     * @return
+     */
+    List<String> findActivityType(ActivityManagerRequest request, OperateContext context);
 }

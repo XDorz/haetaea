@@ -355,4 +355,11 @@ public interface ActivityRepoService {
      * @return
      */
     List<String> findActivityLocation();
+
+    /**
+     * 查询活动类型
+     *
+     * @return
+     */
+    List<String> findActivityType();
 }

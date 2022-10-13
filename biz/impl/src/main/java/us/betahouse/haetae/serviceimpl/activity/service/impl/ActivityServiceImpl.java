@@ -792,4 +792,9 @@ public class ActivityServiceImpl implements ActivityService {
         return activityManager.findActivityLocation(re);
     }
 
+    @Override
+    public List<String> findActivityType(ActivityManagerRequest request, OperateContext context) {
+        ActivityRequest re=new ActivityRequest();
+        return activityManager.findActivityType(re);
+    }
 }
