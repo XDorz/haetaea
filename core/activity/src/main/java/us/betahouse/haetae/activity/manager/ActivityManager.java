@@ -265,4 +265,11 @@ public interface ActivityManager {
      * @return
      */
     List<String> findActivityLocation(ActivityRequest request);
+
+    /**
+     * 查询活动类型
+     *
+     * @return
+     */
+    List<String> findActivityType(ActivityRequest request);
 }

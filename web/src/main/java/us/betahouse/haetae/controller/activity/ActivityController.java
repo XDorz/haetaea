@@ -1452,17 +1452,22 @@ public class ActivityController {
                 ActivityManagerRequestBuilder builder = ActivityManagerRequestBuilder.getInstance();
                 List<ActivityNowLocationBO> activityNowLocationBOS = new ArrayList<>();
                 int size = activityService.findActivityName(builder.build(), context).size();
+                List<String> nameList = activityService.findActivityName(builder.build(), context);
+                List<Date> dateList = activityService.findActivityTime(builder.build(), context);
+                List<String> locationList = activityService.findActivityLocation(builder.build(), context);
+                List<String> typeList = activityService.findActivityType(builder.build(), context);
                 for(int i = 0; i < size; i ++ ){
                     ActivityNowLocationBO activityNowLocationBO = new ActivityNowLocationBO();
-                    activityNowLocationBO.setActivity_name(activityService.findActivityName(builder.build(), context).get(i));
-                    activityNowLocationBO.setStart(activityService.findActivityTime(builder.build(), context).get(i));
-                    if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("操场")){
+                    activityNowLocationBO.setActivity_name(nameList.get(i));
+                    activityNowLocationBO.setStart(dateList.get(i));
+                    if(locationList.get(i) != null && locationList.get(i).contains("操场")){
                         activityNowLocationBO.setLocation("风雨操场");
-                    }else if(activityService.findActivityLocation(builder.build(), context).get(i) != null && activityService.findActivityLocation(builder.build(), context).get(i).contains("线下")){
+                    }else if(locationList.get(i) != null && locationList.get(i).contains("线下")){
                         activityNowLocationBO.setLocation("教学楼");
                     }else{
-                        activityNowLocationBO.setLocation(activityService.findActivityLocation(builder.build(), context).get(i));
+                        activityNowLocationBO.setLocation(locationList.get(i));
                     }
+                    activityNowLocationBO.setActivity_type(typeList.get(i));
                     activityNowLocationBOS.add(activityNowLocationBO);
                 }
                 return RestResultUtil.buildSuccessResult(activityNowLocationBOS, "查询活动名称，活动时间和活动地点");

@@ -378,4 +378,13 @@ public interface ActivityDORepo extends JpaRepository<ActivityDO, Long> {
             ,nativeQuery = true)
     List<String> findActivityLocation();
 
+    /**
+     * 查询活动类型
+     *
+     * @return
+     */
+    @Query(value = "select type from activity where now() < end"
+            ,nativeQuery = true)
+    List<String> findActivityType();
+
 }

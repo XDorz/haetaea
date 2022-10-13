@@ -22,6 +22,11 @@ public class ActivityNowLocationBO extends ToString {
      */
     private String location;
 
+    /**
+     * 活动类型
+     */
+    private String activity_type;
+
     public ActivityNowLocationBO() {
 
     }
@@ -48,5 +53,13 @@ public class ActivityNowLocationBO extends ToString {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getActivity_type() {
+        return activity_type;
+    }
+
+    public void setActivity_type(String activity_type) {
+        this.activity_type = activity_type;
     }
 }

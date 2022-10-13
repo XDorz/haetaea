@@ -379,4 +379,10 @@ public class ActivityManagerImpl implements ActivityManager {
         List<String> findActivityLocation = activityRepoService.findActivityLocation();
         return  findActivityLocation;
     }
+
+    @Override
+    public List<String> findActivityType(ActivityRequest request) {
+        List<String> findActivityType = activityRepoService.findActivityType();
+        return  findActivityType;
+    }
 }
