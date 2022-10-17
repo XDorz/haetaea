@@ -1,4 +1,4 @@
-package us.betahouse.haetae.activity.enums;
+-package us.betahouse.haetae.activity.enums;
 
 import org.apache.commons.lang.StringUtils;
 

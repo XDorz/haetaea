@@ -131,13 +131,13 @@ public class PositionRecordController {
             @Override
             public Result<String> execute() {
                 OperateContext context = new OperateContext();
-                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
+                context.setOperateIP(IPUtil.getIpAd dr(httpServletRequest));
                 PositionRecordManagerRequest positionRecordManagerRequest = PositionRecordManagerRequestBuilder.getInstance()
                         .withPositionRecordId(request.getPositionRecordId())
                         .withUserId(request.getUserId())
                         .build();
                 List<ActivityCreditsStatisticsBO> creditsstatistics = activityRecordService.Creditsstatistics();
-                return RestResultUtil.buildSuccessResult(JSON.toJSONString(creditsstatistics), "获取学分统计成功");
+                return RestResultUtil.buildSuccessResult(creditsstatistics.toString(), "获取学分统计成功");
             }
         });
     }
