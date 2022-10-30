@@ -61,7 +61,7 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
         String activityId=youthLearningBO.getActivityId()==null?activityDORepo.findAllByActivityNameAndStateNot(youthLearningBO.getActivityName(), ActivityStateEnum.CANCELED.getCode()).getActivityId():youthLearningBO.getActivityId();
         youthLearningDO.setActivityId(activityId);
         if(youthLearningBO.getActivityRecordId()==null||youthLearningBO.getActivityRecordId().equals("")) youthLearningBO.setActivityRecordId(idFactory.getYouthLearningRecordId());
-        youthLearningDO.setActivityRecordId(youthLearningBO.getActivityRecordId());
+        youthLearningDO.setActivityRecordId(youthLearningBO.getActivityRecordId()==null?idFactory.getYouthLearningRecordId():youthLearningBO.getActivityRecordId());
         youthLearningDO.setFinishTime(youthLearningBO.getFinishTime());
         youthLearningDO.setScannerUserId(youthLearningBO.getScannerUserId());
         youthLearningDO.setTerm(youthLearningBO.getTerm());
@@ -81,13 +81,9 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
 
     @Override
     public List<YouthLearningBO> batchSaveRecord(List<YouthLearningBO> list) {
-        List<YouthLearningBO> fail=new ArrayList<>();
-        for (YouthLearningBO youthLearningBO : list) {
-            if(!saveRecord(youthLearningBO)){
-                fail.add(youthLearningBO);
-            }
-        }
-        return fail;
+        List<YouthLearningDO> lists = CollectionUtils.toStream(list).filter(Objects::nonNull).map(this::convertDO).collect(Collectors.toList());
+        youthLearningDORepo.saveAll(lists);
+        return null;
     }
 
     @Override
@@ -155,6 +151,14 @@ public class YouthLearningRepoServiceImpl implements YouthLearningRepoService {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<YouthLearningBO> getRecordByActivityId(String activityId) {
+        return CollectionUtils.toStream(youthLearningDORepo.findAllByActivityId(activityId))
+                .filter(Objects::nonNull)
+                .map(this::convert)
+                .collect(Collectors.toList());
     }
 
     @Override

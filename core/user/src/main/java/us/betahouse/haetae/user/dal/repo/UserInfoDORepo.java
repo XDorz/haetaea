@@ -51,6 +51,15 @@ public interface UserInfoDORepo extends JpaRepository<UserInfoDO, Long> {
     UserInfoDO findByStuId(String stuId);
 
     /**
+     * 通过过学号获取用户信息实体
+     *
+     * @param regex
+     * @return
+     */
+    @Query(value = "select * from common_user_info where grade regexp (?1)",nativeQuery = true)
+    List<UserInfoDO> findByGradeRegex(String regex);
+
+    /**
      * 通过过班级号获取用户信息实体
      *
      * @param

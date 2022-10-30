@@ -131,7 +131,7 @@ public class PositionRecordController {
             @Override
             public Result<String> execute() {
                 OperateContext context = new OperateContext();
-                context.setOperateIP(IPUtil.getIpAd dr(httpServletRequest));
+                context.setOperateIP(IPUtil.getIpAddr(httpServletRequest));
                 PositionRecordManagerRequest positionRecordManagerRequest = PositionRecordManagerRequestBuilder.getInstance()
                         .withPositionRecordId(request.getPositionRecordId())
                         .withUserId(request.getUserId())

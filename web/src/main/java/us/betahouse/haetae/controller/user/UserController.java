@@ -264,7 +264,7 @@ public class UserController {
      * @return
      */
     @GetMapping
-    @CheckLogin
+//    @CheckLogin
     @Log(loggerName = LoggerName.WEB_DIGEST)
     public Result<UserVO> checkLogin(UserRequest request, HttpServletRequest httpServletRequest) {
         return RestOperateTemplate.operate(LOGGER, "用户登录维持", request, new RestOperateCallBack<UserVO>() {
@@ -275,6 +275,9 @@ public class UserController {
 
             @Override
             public Result<UserVO> execute() {
+                String referer = httpServletRequest.getHeader("haha");
+                String header = httpServletRequest.getHeader("ka");
+                Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
                 CommonUserRequestBuilder builder = CommonUserRequestBuilder.getInstance()
                         .withRequestId(request.getRequestId())
                         .withUserId(request.getUserId());

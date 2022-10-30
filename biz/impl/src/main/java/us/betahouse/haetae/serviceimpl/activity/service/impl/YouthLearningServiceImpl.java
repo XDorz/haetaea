@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import us.betahouse.haetae.activity.dal.model.ActivityDO;
+import us.betahouse.haetae.activity.dal.model.YouthLearningDO;
 import us.betahouse.haetae.activity.dal.repo.ActivityDORepo;
+import us.betahouse.haetae.activity.dal.repo.YouthLearningDORepo;
 import us.betahouse.haetae.activity.dal.service.YouthLearningRepoService;
 import us.betahouse.haetae.activity.enums.ActivityStateEnum;
 import us.betahouse.haetae.activity.enums.ActivityTypeEnum;
@@ -26,6 +28,7 @@ import us.betahouse.util.utils.CollectionUtils;
 import javax.annotation.PostConstruct;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +46,9 @@ public class YouthLearningServiceImpl implements YouthLearningService {
 
     @Autowired
     YouthLearningRepoService youthLearningRepoService;
+
+    @Autowired
+    YouthLearningDORepo youthLearningDORepo;
 
     @Autowired
     ActivityDORepo activityDORepo;
@@ -271,45 +277,107 @@ public class YouthLearningServiceImpl implements YouthLearningService {
     }
 
 
+//    private Info remove(List<YouthLearningBO> list){
+//        for (YouthLearningBO youthLearningBO : list) {
+//            ActivityDO activityDO = activityDORepo.findAllByActivityNameAndStateNot(youthLearningBO.getActivityName(), ActivityStateEnum.CANCELED.getCode());
+//            AssertUtil.assertNotNull(activityDO, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
+//            youthLearningBO.setActivityId(activityDO.getActivityId());
+//        }
+//        Info info=new Info();
+//        int i=2;
+//        Iterator<YouthLearningBO> iterator = list.iterator();
+//        while (iterator.hasNext()){
+//            YouthLearningBO youthLearningBO = iterator.next();
+//            if(!verify(youthLearningBO,info,i)){
+//                info.getRepeat().add(youthLearningBO);
+//                iterator.remove();
+//                i++;
+//            }
+//        }
+//        List<YouthLearningBO> fails = youthLearningRepoService.removeRepeat(list);
+//        info.setInfo(info.getInfo().append(MessageFormat.format("此次共有【{0}】条项目重复，以略过",String.valueOf(fails.size()))));
+//        return info;
+//    }
+
     private Info remove(List<YouthLearningBO> list){
-        for (YouthLearningBO youthLearningBO : list) {
-            ActivityDO activityDO = activityDORepo.findAllByActivityNameAndStateNot(youthLearningBO.getActivityName(), ActivityStateEnum.CANCELED.getCode());
-            AssertUtil.assertNotNull(activityDO, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
-            youthLearningBO.setActivityId(activityDO.getActivityId());
-        }
+
+        String name = list.get(0).getActivityName();
+        ActivityDO activity = activityDORepo.findAllByActivityNameAndStateNot(name, ActivityStateEnum.CANCELED.getCode());
+        AssertUtil.assertNotNull(activity, CommonResultCode.ILLEGAL_PARAMETERS.getCode(),"查无此活动");
+
+        Calendar calendar=Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        List<UserInfoDO> stuInfoOriginal = userInfoDORepo.findByGradeRegex(year + "|" + (year - 1) + "|" + (year - 2) + "|" + (year - 3) + "|" + (year - 4));
+        List<String> stuInfo=new ArrayList<>();
+        Map<String,String> usmap=new HashMap<>();
+        Map<String,String> sumap=new HashMap<>();
+        stuInfoOriginal.forEach(sinfo->{
+            stuInfo.add(sinfo.getStuId());
+            usmap.put(sinfo.getUserId(),sinfo.getStuId());
+            sumap.put(sinfo.getStuId(),sinfo.getUserId());
+        });
+        String activityId = activity.getActivityId();
+        List<YouthLearningDO> records = youthLearningDORepo.findAllByActivityId(activityId);
+        Set<String> set=new HashSet<>();
+        records.forEach(record -> {
+            String stuId = usmap.getOrDefault(record.getUserId(), null);
+            if(stuId==null||stuId.equals("")){
+                stuId=userInfoDORepo.findByUserId(record.getUserId()).getStuId();
+                sumap.put(stuId,record.getUserId());
+            }
+            set.add(stuId);
+        });
+
         Info info=new Info();
         int i=2;
+
+        List<YouthLearningBO> fails = new ArrayList<>();
         Iterator<YouthLearningBO> iterator = list.iterator();
         while (iterator.hasNext()){
             YouthLearningBO youthLearningBO = iterator.next();
-            if(!verify(youthLearningBO,info,i)){
+            youthLearningBO.setActivityId(activityId);
+
+
+            if(!verify(youthLearningBO,info,i,stuInfo,sumap)){
                 info.getRepeat().add(youthLearningBO);
                 iterator.remove();
                 i++;
+            }else {
+                boolean remove = set.remove(youthLearningBO.getStuId());
+                if(remove){
+                    fails.add(youthLearningBO);
+                    iterator.remove();
+                }
             }
         }
-        List<YouthLearningBO> fails = youthLearningRepoService.removeRepeat(list);
-        info.setInfo(info.getInfo().append(MessageFormat.format("此次共有【{0}】条项目重复，以略过",String.valueOf(fails.size()))));
+        info.setInfo(info.getInfo().append(MessageFormat.format("此次共有【{0}】条项目重复，以略过,",String.valueOf(fails.size()))));
         return info;
     }
 
-    private Info remove(List<YouthLearningBO> list,int delNum){
-        Info info=new Info();
-        int i=2;
-        Iterator<YouthLearningBO> iterator = list.iterator();
-        while (iterator.hasNext()){
-            YouthLearningBO youthLearningBO = iterator.next();
-            if(!verify(youthLearningBO,info,i)){
-                info.getRepeat().add(youthLearningBO);
-                iterator.remove();
-                i++;
-            }
-        }
-        info.setInfo(info.getInfo().append(MessageFormat.format("此次共有【{0}】条项目重复，以略过",String.valueOf(delNum))));
-        return info;
-    }
+//    private Info remove(List<YouthLearningBO> list,int delNum){
+//        Info info=new Info();
+//        int i=2;
+//        Calendar calendar=Calendar.getInstance();
+//        int year = calendar.get(Calendar.YEAR);
+//        List<UserInfoDO> stuInfoOriginal = userInfoDORepo.findByGradeRegex(year + "|" + (year - 1) + "|" + (year - 2) + "|" + (year - 3) + "|" + (year - 4));
+//        List<String> stuInfo=new ArrayList<>();
+//        stuInfoOriginal.forEach(sinfo->{
+//            stuInfo.add(sinfo.getStuId()+"_"+sinfo.getRealName());
+//        });
+//        Iterator<YouthLearningBO> iterator = list.iterator();
+//        while (iterator.hasNext()){
+//            YouthLearningBO youthLearningBO = iterator.next();
+//            if(!verify(youthLearningBO,info,i,stuInfo)){
+//                info.getRepeat().add(youthLearningBO);
+//                iterator.remove();
+//                i++;
+//            }
+//        }
+//        info.setInfo(info.getInfo().append(MessageFormat.format("此次共有【{0}】条项目重复，以略过",String.valueOf(delNum))));
+//        return info;
+//    }
 
-    private boolean verify(YouthLearningBO youthLearningBO,Info info,int j){
+    private boolean verify(YouthLearningBO youthLearningBO,Info info,int j,List<String> stuInfo,Map<String,String> suMap){
         String classId = youthLearningBO.getClassId();
         String stuId = youthLearningBO.getStuId();
         if(classId==null||stuId==null){
@@ -370,13 +438,17 @@ public class YouthLearningServiceImpl implements YouthLearningService {
             info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号未填入，可在另一文件中查看\n",String.valueOf(j))));
             return false;
         }else {
-            userInfoDO=userInfoDORepo.findByStuId(sid);
-            if(userInfoDO==null){
-                info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号不存在，查无此学号，可在另一文件中查看\n",String.valueOf(j))));
-                return false;
+            if(!stuInfo.remove(sid)){
+                userInfoDO=userInfoDORepo.findByStuId(sid);
+                if(userInfoDO==null){
+                    info.setInfo(info.getInfo().append(MessageFormat.format("第【{0}】行 学号不存在，查无此学号，可在另一文件中查看\n",String.valueOf(j))));
+                    return false;
+                }
+                youthLearningBO.setUserId(userInfoDO.getUserId());
+                return true;
             }
         }
-        youthLearningBO.setUserId(userInfoDO.getUserId());
+        youthLearningBO.setUserId(suMap.get(sid));
         return true;
     }
 

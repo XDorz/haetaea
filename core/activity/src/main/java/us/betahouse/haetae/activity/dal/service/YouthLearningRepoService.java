@@ -65,6 +65,11 @@ public interface YouthLearningRepoService {
     List<YouthLearningBO> removeRepeat(List<YouthLearningBO> original);
 
     /**
+     * 获取某一青年大学习的学习信息
+     */
+    List<YouthLearningBO> getRecordByActivityId(String activityId);
+
+    /**
      * 活动名和姓名模糊查找
      *
      * @return

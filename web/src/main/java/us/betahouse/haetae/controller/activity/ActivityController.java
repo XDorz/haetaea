@@ -1143,7 +1143,6 @@ public class ActivityController {
                         youthLearningBO.setStuId(values[i][stuId]);
                         youthLearningBOS.add(youthLearningBO);
                     }
-                    List<YouthLearningBO> fails=null;
                     YouthLearningServiceImpl.Info info=null;
                     if(youthLearningBOS.size()>0){
                         YouthLearningRequest youthLearningRequest=new YouthLearningRequest();
